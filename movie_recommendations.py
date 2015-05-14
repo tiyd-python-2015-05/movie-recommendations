@@ -13,3 +13,12 @@ with open('data/u.data') as rating_data:
             user_data[data[0]].append((data[1], data[2]))
         else:
             user_data[data[0]] = list( (data[1], data[2]) )
+
+with open('data/u.item', encoding='ISO-8859-1') as movie_data:
+    movie_details = csv.reader(movie_data, delimiter='|')
+    movie_titles = {}
+    for movie in movie_details:
+        if movie[0] in movie_titles:
+            movie_titles[movie[0]].append(movie[1].split(','))
+        else:
+            movie_titles[movie[0]] = movie[1].split(',')
