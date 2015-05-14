@@ -188,6 +188,22 @@ def euclidean_distance(v, w):
 
     return 1 / (1 + math.sqrt(sum_of_squares))
 
+
+
+def pearson_product(v, w):
+
+    if len(v) <= 1:
+        return 0
+
+    v_avg = sum(v)/len(v)
+    w_avg = sum(w)/len(w)
+    v_std = math.sqrt(sum((x-v_avg)**2 for x in v))
+    w_std = math.sqrt(sum((y-w_avg)**2 for y in w))
+
+    cov = sum((x-v_avg)*(y-w_avg) for x, y in zip(v, w))
+
+    return cov/(v_std*w_std)
+
 def common_movies(user1, user2):
     indicies = []
     u1_stars = []
@@ -201,16 +217,24 @@ def common_movies(user1, user2):
     return u1_stars, u2_stars
 
 u1 = current_user
-while True:
-    u2 = user_dict[random.choice(list(user_dict.keys()))]
-    if u1 != u2:
-        break
-
-u1s, u2s = common_movies(u1, u2)
 
 print(" ")
 print(" Comparing two random users")
-print(u1s)
-print(u2s)
+print("  Euclidian    Pearson")
 
-print(euclidean_distance(u1s, u2s))
+for i in range(5):
+
+    print(" new set")
+
+    while True:
+        u2 = user_dict[random.choice(list(user_dict.keys()))]
+        if u1 != u2:
+            break
+
+    u1s, u2s = common_movies(u1, u2)
+
+    print(u1s)
+    print(u2s)
+
+    print(str(round(euclidean_distance(u1s, u2s),2)).rjust(6) +
+          str(round(pearson_product(u1s, u2s),2)).rjust(6))
