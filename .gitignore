@@ -1,5 +1,9 @@
 # Created by https://www.gitignore.io
 
+# my own
+data
+
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -58,4 +62,3 @@ docs/_build/
 
 # PyBuilder
 target/
-
