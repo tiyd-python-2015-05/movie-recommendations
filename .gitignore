@@ -59,3 +59,6 @@ docs/_build/
 # PyBuilder
 target/
 
+# Movie data files
+ml-100k/
+ml-1m/
