@@ -1,6 +1,7 @@
 import csv
 import random
 import functools
+import math
 
 
 class RatingException(Exception):
@@ -121,12 +122,12 @@ with open("ml-100k/u.item") as file:
             if int(row[i]) == 1:
                 movie.add_genre(row[i])
         movie_dict[int(props_dict["movie id"])] = movie
-print(movie)
+
 print(" ")
 print(" 10 random movies ")
 for i in range(10):
     tag = random.choice(list(movie_dict.keys()))
-    print(str(tag) + " " + str(movie_dict[tag]))
+    print(str(tag).rjust(5) + " " + str(movie_dict[tag]))
 
 
 user_dict = {}
@@ -157,15 +158,59 @@ def print_top_10():
     top10 = sorted(movie_dict, key=movie_dict.get, reverse=True)[:10]
     for i in range(10):
         movie = movie_dict[top10[i]]
-        print(str(movie)+" "+str(round(movie.avg(),2)))
+        print(str(movie).ljust(50)+" "+str(round(movie.avg(),2)).rjust(6))
 
 print_top_10()
 
-current_user = user_dict[random.choice(list(user_dict.keys()))]
+current_user_id = random.choice(list(user_dict.keys()))
+current_user = user_dict[current_user_id]
 exclude = True
 
 print(" ")
-print(" We will now exclude movies watched by ")
+print(" We will now exclude movies watched by Mr./Mrs. "+str(current_user_id))
 print(str(current_user))
 #print(current_user.movie_hist())
 print_top_10()
+
+def euclidean_distance(v, w):
+    """Given two lists, give the Euclidean distance between them on a scale
+    of 0 to 1. 1 means the two lists are identical.
+    """
+
+    # Guard against empty lists.
+    if len(v) is 0:
+        return 0
+
+    # Note that this is the same as vector subtraction.
+    differences = [v[idx] - w[idx] for idx in range(len(v))]
+    squares = [diff ** 2 for diff in differences]
+    sum_of_squares = sum(squares)
+
+    return 1 / (1 + math.sqrt(sum_of_squares))
+
+def common_movies(user1, user2):
+    indicies = []
+    u1_stars = []
+    u2_stars = []
+    for m1 in user1.rate_val:
+        for m2 in user2.rate_val:
+            if m1 == m2:
+                indicies.append(m1)
+                u1_stars.append(user1.rate_val[m1])
+                u2_stars.append(user2.rate_val[m2])
+    return u1_stars, u2_stars
+
+u1 = current_user
+while True:
+    u2 = user_dict[random.choice(list(user_dict.keys()))]
+    if u1 != u2:
+        break
+
+u1s, u2s = common_movies(u1, u2)
+
+print(" ")
+print(" Comparing two random users")
+print(u1s)
+print(u2s)
+
+print(euclidean_distance(u1s, u2s))
