@@ -46,7 +46,8 @@ class Users():
                                 }])
         self._users[user_id] = current_ratings
     def show_user_ratings(self, user_id):
-        print('Showing ratings for User {}"'.format(user_id))
+        num_ratings = len(users._users[user_id])
+        print('Showing {} ratings for User {}'.format(num_ratings, user_id))
         fieldnames = ['item_id','rating','timestamp']
         for item in fieldnames:
             print(item, ' ', end='')
