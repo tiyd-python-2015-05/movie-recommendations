@@ -51,6 +51,7 @@ def load_items(filename="datasets/ml-100k/u.item"):
 class Ratings():
     def __init__(self):
         self._ratings = {}
+        self._averages = {}
         # self._flat_ratings = {}
 
     def add_rating(self, user_id, item_id, rating, timestamp):
@@ -85,6 +86,21 @@ class Ratings():
                 if rating['user_id'] == user_id:
                     my_ratings.append({'movie': item, 'rating': rating['rating']})
         return my_ratings
+
+    def calculate_averages(self):
+        averages = {}
+        self._averages = []
+        for item_id in self._ratings:
+            averages[item_id] = self.avg_rating(item_id)
+        for item_id in sorted(averages, key=averages.get, reverse=True):
+            self._averages.append((item_id, averages[item_id]))
+    def top_n(self, n, movies):
+        top = []
+        averages = self._averages[:n]
+        for item in averages:
+            top.append((movies.movie_title(item[0]), item[1]))
+        return top
+
     # def get_ratings(self):
     #    return copy(self._ratings)
 
@@ -114,3 +130,5 @@ if __name__ == '__main__':
     movies.show_movie('123')
     pprint(ratings.user_ratings('124'))
     pprint(movies.movie_title('123'))
+    ratings.calculate_averages()
+    pprint(ratings.top_n(20,movies))
