@@ -24,11 +24,37 @@ def load_data(filename="datasets/ml-100k/u.data"):
     fieldnames = ['user_id','item_id','rating','timestamp']
     with open(filename) as file:
         reader = csv.DictReader(file, delimiter='\t', fieldnames=fieldnames)
-        headers = next(reader)
+        #headers = next(reader)
+        headers = fieldnames
         print(headers)
         print("---")
+        # line = next(reader)
+        # print(line)
+        users = Users()
         for row in reader:
-            print(row)
+            users.add_rating(**row)
+        return users
+
+class Users():
+    def __init__(self):
+        self._users = {}
+    def add_rating(self, user_id, item_id, rating, timestamp):
+        current_ratings = self._users.setdefault(user_id,[])
+        current_ratings.append([{'item_id': item_id,
+                                 'rating': rating,
+                                 'timestamp': timestamp
+                                }])
+        self._users[user_id] = current_ratings
+    def show_user_ratings(self, user_id):
+        print('Showing ratings for User {}"'.format(user_id))
+        fieldnames = ['item_id','rating','timestamp']
+        for item in fieldnames:
+            print(item, ' ', end='')
+        print('\n==========================')
+        for i in users._users[user_id]:
+            print('{item_id}\t   {rating}\t {timestamp}'.format(**i[0]))
+        # print(users._users['196'])
 
 if __name__ == '__main__':
-    load_data()
+    users = load_data()
+    users.show_user_ratings('192')
