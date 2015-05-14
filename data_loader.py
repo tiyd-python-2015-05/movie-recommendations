@@ -77,6 +77,14 @@ class Ratings():
         avg_rating = sum(item_ratings)/len(item_ratings)
         return avg_rating
         #pprint(self._ratings[item_id])
+
+    def user_ratings(self, user_id):
+        my_ratings = []
+        for item, ratings in self._ratings.items():
+            for rating in ratings:
+                if rating['user_id'] == user_id:
+                    my_ratings.append({'movie': item, 'rating': rating['rating']})
+        return my_ratings
     # def get_ratings(self):
     #    return copy(self._ratings)
 
@@ -102,3 +110,4 @@ if __name__ == '__main__':
     print('Average rating: ', ratings.avg_rating('1000'))
     movies = load_items()
     movies.show_movie('123')
+    pprint(ratings.user_ratings('124'))
