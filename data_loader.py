@@ -103,6 +103,8 @@ class Movies():
         self._movies[movie_id] = current_movies
     def show_movie(self, movie_id):
         pprint(self._movies[movie_id])
+    def movie_title(self, movie_id):
+        return self._movies[movie_id][0]['movie title']
 
 if __name__ == '__main__':
     ratings = load_data()
@@ -111,3 +113,4 @@ if __name__ == '__main__':
     movies = load_items()
     movies.show_movie('123')
     pprint(ratings.user_ratings('124'))
+    pprint(movies.movie_title('123'))
