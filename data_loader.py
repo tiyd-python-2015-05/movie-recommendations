@@ -87,7 +87,7 @@ class Ratings():
                     my_ratings.append({'movie': item, 'rating': rating['rating']})
         return my_ratings
 
-    def calculate_averages(self, min_review_cutoff=5):
+    def calculate_averages(self, min_review_cutoff=20):
         averages = {}
         self._averages = []
         #for item_id in self._ratings:
@@ -103,6 +103,13 @@ class Ratings():
         for item in averages:
             top.append((movies.movie_title(item[0]), item[1]))
         return top
+
+    def top_n_unseen(self, user_id, n, movies):
+        my_ratings = self.user_ratings(user_id)
+        print(len(my_ratings))
+        rankings = self.top_n(n, movies)
+
+        return rankings
 
     # def get_ratings(self):
     #    return copy(self._ratings)
@@ -127,11 +134,13 @@ class Movies():
 
 if __name__ == '__main__':
     ratings = load_data()
-    ratings.show_item_ratings('190')
-    print('Average rating: ', ratings.avg_rating('1000'))
+    # ratings.show_item_ratings('500')
+    # print('Average rating: ', ratings.avg_rating('318'))
     movies = load_items()
-    movies.show_movie('123')
-    pprint(ratings.user_ratings('124'))
-    pprint(movies.movie_title('123'))
+    # movies.show_movie('318')
+    # pprint(ratings.user_ratings('200'))
+    # pprint(movies.movie_title('318'))
     ratings.calculate_averages()
-    pprint(ratings.top_n(20,movies))
+    pprint(ratings.top_n(5,movies))
+    #pprint(ratings.top_n_unseen('200',5,movies)) #user 200 should not see move 318 (Schindler's List)
+    # #pprint([ratings.show_item_ratings(i[0]) for i in ratings._averages[0:2]])
