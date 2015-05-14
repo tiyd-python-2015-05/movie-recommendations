@@ -37,3 +37,7 @@ def test_data_files_are_present():
         assert file.readline()
     with open("datasets/ml-100k/u.user") as file:
         assert file.readline()
+
+def test_num_items():
+    ratings = load_data("datasets/ml-100k/u.data")
+    assert len(ratings._ratings) == 1682

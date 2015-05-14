@@ -1,14 +1,7 @@
 import csv
+from pprint import pprint as pprint
 
 
-# u.info
-"""
-movie id | movie title | release date | video release date |
-IMDb URL | unknown | Action | Adventure | Animation |
-Children's | Comedy | Crime | Documentary | Drama | Fantasy |
-Film-Noir | Horror | Musical | Mystery | Romance | Sci-Fi |
-Thriller | War | Western |
-"""
 
 # u.user
 """
@@ -29,16 +22,19 @@ def load_data(filename="datasets/ml-100k/u.data"):
             ratings.add_rating(**row)
         return ratings
 
+
+
 class Ratings():
     def __init__(self):
         self._ratings = {}
         # self._flat_ratings = {}
+
     def add_rating(self, user_id, item_id, rating, timestamp):
         current_ratings = self._ratings.setdefault(item_id,[])
-        current_ratings.append([{'user_id': user_id,
+        current_ratings.append({'user_id': user_id,
                                  'rating': rating,
                                  'timestamp': timestamp
-                                }])
+                                })
         self._ratings[item_id] = current_ratings
 
     def show_item_ratings(self, item_id):
@@ -49,9 +45,20 @@ class Ratings():
             print(item, ' ', end='')
         print('\n==========================')
         for i in self._ratings[item_id]:
-            print('{user_id}\t   {rating}\t {timestamp}'.format(**i[0]))
+            print('{user_id}\t   {rating}\t {timestamp}'.format(**i))
         # print(users._users['196'])
 
+    def avg_rating(self, item_id):
+        item_ratings = [int(r['rating']) for r in self._ratings[item_id]]
+        avg_rating = sum(item_ratings)/len(item_ratings)
+        return avg_rating
+        #pprint(self._ratings[item_id])
+    def get_ratings(self):
+        return copy(self._ratings)
+class Movie():
+    pass
+
 if __name__ == '__main__':
-    users = load_data()
-    users.show_item_ratings('192')
+    ratings = load_data()
+    ratings.show_item_ratings('190')
+    print('Average rating: ', ratings.avg_rating('1000'))
