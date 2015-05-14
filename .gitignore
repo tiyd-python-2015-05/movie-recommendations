@@ -62,3 +62,6 @@ target/
 # Movie data files
 ml-100k/
 ml-1m/
+
+ml-100k-README.txt
+.DS_Store
