@@ -59,3 +59,13 @@ docs/_build/
 # PyBuilder
 target/
 
+# Project Specific
+notes.txt
+u.data
+u.genre
+u.info
+u.item
+u.cleandatalist
+u.cleanitemlist
+u.sampledata
+u.sampleitem
