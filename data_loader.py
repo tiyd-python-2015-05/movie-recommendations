@@ -87,13 +87,16 @@ class Ratings():
                     my_ratings.append({'movie': item, 'rating': rating['rating']})
         return my_ratings
 
-    def calculate_averages(self):
+    def calculate_averages(self, min_review_cutoff=5):
         averages = {}
         self._averages = []
-        for item_id in self._ratings:
-            averages[item_id] = self.avg_rating(item_id)
+        #for item_id in self._ratings:
+        #    averages[item_id] = self.avg_rating(item_id)
+        averages = {item: self.avg_rating(item) for item in self._ratings
+                    if len(self._ratings[item]) > min_review_cutoff}
         for item_id in sorted(averages, key=averages.get, reverse=True):
             self._averages.append((item_id, averages[item_id]))
+
     def top_n(self, n, movies):
         top = []
         averages = self._averages[:n]
