@@ -22,3 +22,10 @@ with open('data/u.item', encoding='ISO-8859-1') as movie_data:
             movie_titles[movie[0]].append(movie[1].split(','))
         else:
             movie_titles[movie[0]] = movie[1].split(',')
+
+def movie_ratings(movie_id):
+    movie_title = movie_titles[movie_id]
+    movie_ratings = movie_rate_data[movie_id]
+    return movie_title+"\n"+movie_ratings
+
+print(movie_ratings(1226))
