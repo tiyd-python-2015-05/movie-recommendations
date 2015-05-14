@@ -1,7 +1,5 @@
 import csv
 
-# u.data
-# user id | item id | rating | timestamp
 
 # u.info
 """
@@ -20,9 +18,12 @@ Demographic information about the users; this is a tab
               The user ids are the ones used in the u.data data set.
 """
 
-def load_data(filename):
-    with open("datasets/ml-100k/u.data") as file:
-        reader = csv.reader(file, delimiter='\t')
+def load_data(filename="datasets/ml-100k/u.data"):
+    # u.data
+    # user id | item id | rating | timestamp
+    fieldnames = ['user_id','item_id','rating','timestamp']
+    with open(filename) as file:
+        reader = csv.DictReader(file, delimiter='\t', fieldnames=fieldnames)
         headers = next(reader)
         print(headers)
         print("---")
@@ -30,4 +31,4 @@ def load_data(filename):
             print(row)
 
 if __name__ == '__main__':
-    load_data('x')
+    load_data()
