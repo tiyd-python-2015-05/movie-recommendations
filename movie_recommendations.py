@@ -80,7 +80,8 @@ class MoviesData:
         else:
             return not_rated_by
 
-    def ratings_for_movies_watched_by_two(self, first_user_id, second_user_id):
+    def ratings_by_two(self, first_user_id, second_user_id):
+        '''get rating from two users for movies they have both seen'''
         user1 = []
         user2 = []
         for movie in self.user_rate_data[first_user_id]:
@@ -92,6 +93,43 @@ class MoviesData:
                 user2.append(self.user_rate_data[second_user_id][movie])
         return user1, user2
 
+    def movies_recommended_to_user(self, current_user):
+        # what movies current user has not watched
+        movies_not_watched = []
+        movies_user_has_watched = self.user_movies[current_user]
+        for movie in self.user_movies:
+            if movie not in movies_user_has_watched:
+                movies_not_watched.append(movie)
+
+        # get similarities between this user and the others
+        # they have to have euclidean_distance of >= .7
+        similarities = {}
+        for user in self.user_movies:
+            ratings = self.ratings_by_two(current_user, user)
+            eu_distance = self.euclidean_distance(ratings[0], ratings[1])
+            if eu_distance >= 0.5:
+                similarities[user]=eu_distance
+
+        # find movies watched by similar users, this user has not seen
+        # for each user
+        movies_to_recommend = {}
+        for user in similarities:
+            #for the movies they watched which ones this user has not seen
+            #such that similarity * rating >= 4
+            for movie_watched in self.user_movies[user]:
+                similar_by = similarities[user]*self.user_rate_data[user][movie_watched]
+                if movie_watched not in movies_not_watched and similar_by >= 4:
+                    if user in movies_to_recommend:
+                        movies_to_recommend[user].update({movie_watched:similar_by})
+                    else:
+                        movies_to_recommend[user] = {movie_watched:similar_by}
+
+        recommended_movies = []
+        for user, movies in movies_to_recommend.items():
+            for movie in movies:
+                if movie not in recommended_movies:
+                    recommended_movies.append(movie)
+                    print("{} : Rating {}".format(self.movie_title(movie), movies[movie] ))
 
     def euclidean_distance(self,v, w):
         """Given two lists, give the Euclidean distance between them on a scale
@@ -112,18 +150,4 @@ class MoviesData:
 if __name__ == '__main__':
     movie = MoviesData('data/u.data', 'data/u.item')
 
-    #print(movie.movie_ratings(1227))
-    #print(movie.average_rating(727))
-    #movie.user_ratings(23)
-    #print(movie.movie_title(727))
-
-    #print(movie.user_movies)
-    rates = movie.ratings_for_movies_watched_by_two(1,2)
-    print(rates)
-    print(movie.euclidean_distance(rates[0], rates[1]))
-#    print(movie.user_rate_data[2])
-    #print(movie.popular_movies_not_rated_by_person(27))
-    if movie.popular_movies_not_rated_by_person(27) != None:
-        for kamuvi in movie.popular_movies_not_rated_by_person(27):
-            #print(kamuvi[0])
-            pass
+    movie.movies_recommended_to_user(23)
