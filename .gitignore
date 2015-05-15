@@ -59,3 +59,9 @@ docs/_build/
 # PyBuilder
 target/
 
+u.data
+u.genre
+u.info
+u.item
+.DS_Store
+notes.txt
