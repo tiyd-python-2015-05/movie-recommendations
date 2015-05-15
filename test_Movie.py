@@ -53,8 +53,20 @@ def test_user_class():
 
 user_id_dict = {196:[[250, 3], [253, 2], [255, 3], [210, 2], [12, 3], [10, 5]]}
 
-def test_review_list():
+def test_rating_list():
     m = User(196)
     m.rating_list(user_id_dict)
     assert m.user_rating == [[250, 3], [253, 2], [255, 3], [210, 2], \
                           [12, 3], [10, 5]]
+    assert m.user_average == 3
+
+def test_Movie_string():
+    m = Movie(1)
+    m.movie_title(movie_names_dict)
+    m.movie_ratings_and_average(movie_id_dict)
+    assert str(m) == "For the movie StarWars the average rating is 3.0."
+
+def test_User_string():
+    u = User(196)
+    u.rating_list(user_id_dict)
+    assert str(u) == "User: 196, has reviewed 6 movies with an average rating of 3.0"
