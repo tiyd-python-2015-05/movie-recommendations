@@ -19,7 +19,7 @@ class User():
     def load_users(cls, filename):
         fieldnames = ['user_id','age','gender','job', 'zipcode']
         users = {}
-        with open(filename) as file:
+        with open(filename, encoding="windows-1252") as file:
             reader = csv.DictReader(file, delimiter='|', fieldnames=fieldnames)
             for row in reader:
                 user_id = row.pop('user_id')
@@ -30,7 +30,7 @@ class User():
     def load_ratings(cls, filename, users):
         fieldnames = ['user_id','item_id','rating','timestamp']
         #ratings = {}
-        with open(filename) as file:
+        with open(filename, encoding="windows-1252") as file:
             reader = csv.DictReader(file, delimiter='\t', fieldnames=fieldnames)
             for row in reader:
                 user_id = row['user_id']
@@ -64,7 +64,7 @@ class Movie():
     @classmethod
     def load_movies(cls, filename):
         movies = {}
-        with open(filename) as file:
+        with open(filename, encoding="windows-1252") as file:
             reader = csv.DictReader(file, delimiter='|', fieldnames=Movie.item_fieldnames)
             for row in reader:
                 movie_id = row.pop('movie_id')
@@ -75,7 +75,7 @@ class Movie():
     def load_ratings(cls, filename, movies):
         fieldnames = ['user_id','item_id','rating','timestamp']
         #ratings = {}
-        with open(filename) as file:
+        with open(filename, encoding="windows-1252") as file:
             reader = csv.DictReader(file, delimiter='\t', fieldnames=fieldnames)
             for row in reader:
                 user_id = row['user_id']
@@ -102,15 +102,6 @@ class Movie():
     def avg_rating(self):
         return sum([int(val) for val in self.ratings.values()]) / len(self.ratings)
 
-"""
-        with open(filename, encoding="windows-1252") as file:
-            reader = csv.DictReader(file, delimiter='|', fieldnames=fieldnames)
-            movies = Movies()
-            for row in reader:
-                #print(row)
-                movies.add_movie(**row)
-            return movies
-"""
 if __name__ == '__main__':
     users = User.load_users('datasets/ml-100k/uhead.user')
     users = User.load_ratings('datasets/ml-100k/uhead.data', users)
