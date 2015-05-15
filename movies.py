@@ -58,3 +58,7 @@ class Frame:
 
     def users(self):
         return [name for name in {name[0] for name in self.data}]
+
+    def users_by_movie(self, movie_id):
+        return {item[0]: self.data[item] for item in self.data
+                if item[1] == movie_id}
