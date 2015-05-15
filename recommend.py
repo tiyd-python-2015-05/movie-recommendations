@@ -70,9 +70,9 @@ class Movie():
                 movie_id = row.pop('movie_id')
                 movies[movie_id] = Movie(**row)
         return movies
-"""
+
     @classmethod
-    def load_ratings(cls, filename, users):
+    def load_ratings(cls, filename, movies):
         fieldnames = ['user_id','item_id','rating','timestamp']
         #ratings = {}
         with open(filename) as file:
@@ -82,18 +82,19 @@ class Movie():
                 item_id = row['item_id']
                 rating = row['rating']
                 try:
-                    users[user_id].ratings[item_id] = rating
+                    movies[item_id].ratings[user_id] = rating
                 except KeyError:
-                    assert KeyError("That user_id does not exist")
-        return users
+                    assert KeyError("That movie or user id does not exist")
+        return movies
+
     @property
-    def movies(self):
+    def users(self):
         try:
-            return [item_id for item_id in self.ratings]
+            return [user_id for user_id in self.ratings]
         except:
-            assert KeyError("No movies found for this user")
+            assert KeyError("No users found for this movie")
 
-
+"""
         with open(filename, encoding="windows-1252") as file:
             reader = csv.DictReader(file, delimiter='|', fieldnames=fieldnames)
             movies = Movies()

@@ -12,7 +12,7 @@ def test_load_users():
     assert users['1'].job == 'technician'
     assert users['10'].zipcode == '90703'
 
-def test_load_ratings():
+def test_load_user_ratings():
     # cat u.data ',' egrep "^[1-9]\t" > uhead.data
     users = User.load_users('datasets/ml-100k/uhead.user')
     users = User.load_ratings('datasets/ml-100k/uhead.data', users)
@@ -42,3 +42,17 @@ def test_load_movies():
     pprint(movies)
     assert movies['1'].movie_title == 'Toy Story (1995)'
     assert movies['1'].Animation == '1'
+
+def test_load_movie_ratings():
+    # cat u.data ',' egrep "^[1-9]\t" > uhead.data
+    movies = Movie.load_movies('datasets/ml-100k/uhead.item')
+    movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
+    assert len(movies['7'].ratings) == 5
+    pprint(movies['7'].ratings)
+    assert movies['7'].ratings['9'] == '4'
+
+def test_movies_user_property():
+    movies = Movie.load_movies('datasets/ml-100k/uhead.item')
+    movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
+    for user_id in ['2', '6', '5', '1']:
+        assert user_id in movies['1'].users
