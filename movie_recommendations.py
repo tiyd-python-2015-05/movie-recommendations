@@ -1,4 +1,4 @@
-from user import *
+from data_handling import *
 import math
 
 movie_data = get_movie_data("movie_lens-100k/u.item")
