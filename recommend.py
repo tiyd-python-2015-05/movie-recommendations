@@ -49,6 +49,13 @@ class User():
             assert KeyError("No movies found for this user")
 
 class Movie():
+    item_fieldnames = \
+        ['movie_id', 'movie_title', 'release_date', 'video_release_date',
+        'IMDb URL', 'unknown', 'Action', 'Adventure', 'Animation',
+        "Childrens", 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy',
+        'FilmNoir', 'Horror', 'Musical', 'Mystery', 'Romance', 'SciFi',
+        'Thriller', 'War', 'Western']
+
     def __init__(self, **kwargs):
         for prop, val in kwargs.items():
             setattr(self, prop, val)
@@ -56,15 +63,9 @@ class Movie():
 
     @classmethod
     def load_movies(cls, filename):
-        fieldnames = \
-            ['movie id', 'movie title', 'release date', 'video release date',
-            'IMDb URL', 'unknown', 'Action', 'Adventure', 'Animation',
-            "Children's", 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy',
-            'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi',
-            'Thriller', 'War', 'Western']
         movies = {}
         with open(filename) as file:
-            reader = csv.DictReader(file, delimiter='|', fieldnames=fieldnames)
+            reader = csv.DictReader(file, delimiter='|', fieldnames=Movie.item_fieldnames)
             for row in reader:
                 movie_id = row.pop('movie_id')
                 movies[movie_id] = Movie(**row)

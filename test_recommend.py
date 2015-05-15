@@ -26,13 +26,7 @@ def test_user_movies_property():
         assert item_id in users['1'].movies
 
 def test_movie_creation():
-    fieldnames = \
-        ['movie_id', 'movie_title', 'release_date', 'video_release_date',
-        'IMDb_URL', 'unknown', 'Action', 'Adventure', 'Animation',
-        "Childrens", 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy',
-        'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'SciFi',
-        'Thriller', 'War', 'Western']
-
+    fieldnames = Movie.item_fieldnames
     values = ['1','Toy Story (1995)','01-Jan-1995','','http://us.imdb.com/M/title-exact?Toy%20Story%20(1995)','0','0','0','1','1','1','0','0','0','0','0','0','0','0','0','0','0','0','0']
     kwargs = dict(zip(fieldnames, values))
     movie = Movie(**kwargs)
@@ -42,3 +36,9 @@ def test_movie_creation():
     assert movie.Animation == '1'
     assert movie.movie_title == 'Toy Story (1995)'
     assert movie.Western == '0'
+
+def test_load_movies():
+    movies = Movie.load_movies('datasets/ml-100k/uhead.item')
+    pprint(movies)
+    assert movies['1'].movie_title == 'Toy Story (1995)'
+    assert movies['1'].Animation == '1'
