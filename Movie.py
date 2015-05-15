@@ -15,7 +15,8 @@ class Movie:
         total = 0.0
         for i in range(len(self.movie_rating)):
                 total += self.movie_rating[i][1]
-                self.average_rating = (total/len(self.movie_rating))
+                self.average_rating = round((total/len(self.movie_rating)), 2)
+
 
 class User:
     def __init__(self, user_id):
@@ -27,7 +28,7 @@ class User:
         total = 0.0
         for i in range(len(self.user_rating)):
                 total += self.user_rating[i][1]
-                self.user_average = (total/len(self.user_rating))
+                self.user_average = round((total/len(self.user_rating)), 2)
 
     def __str__(self):
         return "User: {}, has reviewed {} movies with an average rating of {}"\
