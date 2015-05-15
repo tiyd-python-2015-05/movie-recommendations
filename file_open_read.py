@@ -65,6 +65,9 @@ def item_list_to_movie_names_dictionary(item_list, number_movies):
     return movie_names_dict
 
 
+
+
+
 if __name__ == "__main__":
     number_users = 943
     number_movies = 1682
@@ -75,9 +78,9 @@ if __name__ == "__main__":
     user_rev_dict = data_list_to_user_dictionary(data_list, number_users)
     movie_rev_dict = data_list_to_movie_dictionary(data_list, number_movies)
     movie_names_dict = item_list_to_movie_names_dictionary(item_list, number_movies)
-    print(movie_names_dict[67])
-    print(movie_names_dict[1500])
-    print(movie_rev_dict[500])
-    print(movie_rev_dict[650])
-    print(user_rev_dict[450])
-    print(user_rev_dict[35])
+    # print(movie_names_dict[67])
+    # print(movie_names_dict[1500])
+    # print(movie_rev_dict[500])
+    # print(movie_rev_dict[650])
+    # print(user_rev_dict[450])
+    # print(user_rev_dict[35])

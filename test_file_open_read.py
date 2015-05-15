@@ -1,5 +1,6 @@
 from file_open_read import *
 from nose.tools import raises
+from classes import *
 
 data_list = [['196', '242', '3', '881250949'],
 ['186', '302', '3', '891717742'],
@@ -71,6 +72,6 @@ def test_item_list_creates_correct_movie_names_dict():
     assert new_dict[2] == 'GoldenEye (1995)'
     assert new_dict[5] == 'Copycat (1995)'
     assert new_dict[1682] == ""
-    
+
 def test_clean_item_list():
     pass
