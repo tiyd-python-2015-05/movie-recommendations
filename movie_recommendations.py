@@ -1,6 +1,5 @@
 import csv
 import math
-#open the file
 
 class MoviesData:
 
@@ -9,7 +8,6 @@ class MoviesData:
     movie_titles = {}
     user_movies = {}
     def __init__(self, rate_data_source, movie_data_source):
-        # 'data/u.data'
         with open(rate_data_source) as rating_data:
             rate_data = csv.reader(rating_data, delimiter='\t')
             for data in rate_data:
@@ -25,7 +23,6 @@ class MoviesData:
                     self.user_rate_data[int(data[0])] = {int(data[1]):int(data[2])}
                     self.user_movies[int(data[0])] = [int(data[1])]
 
-        # 'data/u.item'
         with open(movie_data_source, encoding='ISO-8859-1') as movie_data:
             movie_details = csv.reader(movie_data, delimiter='|')
             for movie in movie_details:
@@ -34,13 +31,13 @@ class MoviesData:
                 else:
                     self.movie_titles[int(movie[0])] = movie[1].split(',')
 
-    # get ratings for a movie by id
+
     def movie_ratings(self, movie_id):
         movie_title = self.movie_titles[movie_id][0]
         movie_ratings = self.movie_rate_data[movie_id]
         return "{}\n {}".format(movie_title,movie_ratings)
 
-    #get an average rating for a movie. to one decimal place
+
     def average_rating(self, movie_id):
         movie_title = self.movie_titles[movie_id][0]
         movie_ratings = self.movie_rate_data[movie_id]
@@ -48,15 +45,15 @@ class MoviesData:
         return "Movie:\t {}:\nOverall Rating: {}".format(movie_title, average)
 
 
-    # get movie title
     def movie_title(self, movie_id):
         return self.movie_titles[movie_id][0]
 
-    # get ratings a specific user has made
+
     def user_ratings(self, user_id):
         user_ratings = self.user_rate_data[user_id]
         for rate in user_ratings:
             print("Movie:\t {}\n Rating: {}\n".format(self.movie_title(rate[0]), rate[1]))
+
 
     def popular_movies(self):
         '''Movies rated more than 20 times'''
@@ -66,6 +63,7 @@ class MoviesData:
                 popular_movies[movie] = round(sum(self.movie_rate_data[movie])/len(self.movie_rate_data[movie]), 1)
 
         return popular_movies
+
 
     def popular_movies_not_rated_by_person(self, user_id):
         '''Movies not rated by person'''
@@ -80,6 +78,7 @@ class MoviesData:
         else:
             return not_rated_by
 
+
     def ratings_by_two(self, first_user_id, second_user_id):
         '''get rating from two users for movies they have both seen'''
         user1 = []
@@ -92,6 +91,7 @@ class MoviesData:
                 user1.append(self.user_rate_data[first_user_id][movie])
                 user2.append(self.user_rate_data[second_user_id][movie])
         return user1, user2
+
 
     def movies_recommended_to_user(self, current_user):
         # what movies current user has not watched
@@ -130,6 +130,7 @@ class MoviesData:
                 if movie not in recommended_movies:
                     recommended_movies.append(movie)
                     print("{} : Rating {}".format(self.movie_title(movie), movies[movie] ))
+
 
     def euclidean_distance(self,v, w):
         """Given two lists, give the Euclidean distance between them on a scale
