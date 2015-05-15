@@ -26,6 +26,6 @@ def make_user_object_list(num_of_users, user_id_dict):
     user_object_list = []
     for i in range(num_of_users):
         users = User(i+1)
-        rating_list(user_id_dict)
+        users.rating_list(user_id_dict)
         user_object_list.append(users)
     return user_object_list
