@@ -1,154 +1,76 @@
-import csv
-import math
+from movies_data import MoviesData
+import sys
+class MovieRecommender(MoviesData):
 
-class MoviesData:
+    def welcome(self):
+        print("==========MOVIE RECOMMENDER==========")
+        print("Enter the corresponding number for the service you want!")
+        print("\t\t1 - To see ratings for a movie of your choice (Use Movie ID)\n \
+               2 - Look at average rating for a movie of choice\n \
+               3 - Check the name for the Movie ID you have\n \
+               4 - See how a certain user (with USER ID) has rated several movies\n \
+               5 - Want to see popular movies?\n \
+               6 - Want to see top movies that a certain user (USER ID) has not seen\n \
+               7 - Want to get similarities between two different users?\n \
+               8 - Want a suggestion for movies to watch that you have not watched\n")
 
-    movie_rate_data = {}
-    user_rate_data = {}
-    movie_titles = {}
-    user_movies = {}
-    def __init__(self, rate_data_source, movie_data_source):
-        with open(rate_data_source) as rating_data:
-            rate_data = csv.reader(rating_data, delimiter='\t')
-            for data in rate_data:
-                if int(data[1]) in self.movie_rate_data:
-                    self.movie_rate_data[int(data[1])].append(int(data[2]))
-                else:
-                    self.movie_rate_data[int(data[1])] = [int(data[2])]
+        print("At any time, press 0 (zero) to quit")
 
-                if int(data[0]) in self.user_rate_data:
-                    self.user_rate_data[int(data[0])].update({int(data[1]):int(data[2])})
-                    self.user_movies[int(data[0])].append(int(data[1]))
-                else:
-                    self.user_rate_data[int(data[0])] = {int(data[1]):int(data[2])}
-                    self.user_movies[int(data[0])] = [int(data[1])]
+    def get_user_choice(self, servicemessage = "What service do you want? ",
+                        errormessage = "You have to enter a number in the range 0 - 8"):
+        try:
+            userchoice = int(input(servicemessage))
+            return userchoice
+        except:
+            print(errormessage)
+            self.get_user_choice()
 
-        with open(movie_data_source, encoding='ISO-8859-1') as movie_data:
-            movie_details = csv.reader(movie_data, delimiter='|')
-            for movie in movie_details:
-                if int(movie[0]) in self.movie_titles:
-                    self.movie_titles[int(movie[0])].append(movie[1].split(','))
-                else:
-                    self.movie_titles[int(movie[0])] = movie[1].split(',')
+    def start_recommender(self,userchoice):
+        if userchoice == 0:
+            print("Bye")
+            sys.exit()
 
+        elif userchoice == 1:
+            movieid = self.get_user_choice("Movie ID: ", "Enter a valid movie ID")
+            title, ntimes,rating,avg_rate = self.movie_ratings(movieid)
+            print("Title: {}\nRated: {} times\nRating: {}\nAverage Rating: {}"
+                    .format(title, ntimes,rating,avg_rate))
 
-    def movie_ratings(self, movie_id):
-        movie_title = self.movie_titles[movie_id][0]
-        movie_ratings = self.movie_rate_data[movie_id]
-        return "{}\n {}".format(movie_title,movie_ratings)
+        elif userchoice == 2:
+            movieid = self.get_user_choice("Movie ID: ", "Enter a valid movie ID")
+            title, ntimes,rating,avg_rate = self.movie_ratings(movieid)
+            print("Title: {}\nAverage Rating: {}\nRated {} times".format(title, avg_rate, ntimes))
 
+        elif userchoice == 3:
+            movieid = self.get_user_choice("Movie ID: ", "Enter a valid movie ID")
+            title, ntimes,rating,avg_rate = self.movie_ratings(movieid)
+            print("Title: {}\nAverage Rating: {}".format(title, avg_rate))
 
-    def average_rating(self, movie_id):
-        movie_title = self.movie_titles[movie_id][0]
-        movie_ratings = self.movie_rate_data[movie_id]
-        average = round(sum(movie_ratings)/len(movie_ratings),1)
-        return "Movie:\t {}:\nOverall Rating: {}".format(movie_title, average)
+        elif userchoice == 4:
+            userid = self.get_user_choice("User ID: ", "Enter a valid User ID")
+            user_movie_ratings = self.user_ratings(userid)
+            for movie in user_movie_ratings:
+                print("Movie:\t {}\n Rating: {}\n".format(self.movie_title(movie), user_movie_ratings[movie]))
 
-
-    def movie_title(self, movie_id):
-        return self.movie_titles[movie_id][0]
-
-
-    def user_ratings(self, user_id):
-        user_ratings = self.user_rate_data[user_id]
-        for rate in user_ratings:
-            print("Movie:\t {}\n Rating: {}\n".format(self.movie_title(rate[0]), rate[1]))
-
-
-    def popular_movies(self):
-        '''Movies rated more than 20 times'''
-        popular_movies = {}
-        for movie in self.movie_rate_data:
-            if len(self.movie_rate_data[movie]) >= 100:
-                popular_movies[movie] = round(sum(self.movie_rate_data[movie])/len(self.movie_rate_data[movie]), 1)
-
-        return popular_movies
+        elif userchoice == 5:
+            print("You can choose Popular movies based on the number of reviews")
+            review_number = self.get_user_choice("How many times should movies be reviewed? : ", "Enter a valid number")
+            pop_moview = self.popular_movies(review_number)
+            for movieid in pop_moview:
+                print("Title: {}\nAverage Rating: {}".format(self.movie_title(movieid), pop_moview[movieid]))
 
 
-    def popular_movies_not_rated_by_person(self, user_id):
-        '''Movies not rated by person'''
-        not_rated_by = []
-        for movie in self.popular_movies():
-            if movie not in self.user_movies[user_id]:
-                not_rated_by.append(self.movie_title(movie).split(','))
-            else:
-                pass
-        if len(not_rated_by) == 0:
-            return None
-        else:
-            return not_rated_by
 
 
-    def ratings_by_two(self, first_user_id, second_user_id):
-        '''get rating from two users for movies they have both seen'''
-        user1 = []
-        user2 = []
-        for movie in self.user_rate_data[first_user_id]:
-            if movie in self.user_rate_data[second_user_id]:
-                # print("Movie {}:\n User {} rated {}: User {} rated {}".
-                #         format(movie, first_user_id,self.user_rate_data[first_user_id][movie],
-                #                 second_user_id,self.user_rate_data[second_user_id][movie]))
-                user1.append(self.user_rate_data[first_user_id][movie])
-                user2.append(self.user_rate_data[second_user_id][movie])
-        return user1, user2
 
 
-    def movies_recommended_to_user(self, current_user):
-        # what movies current user has not watched
-        movies_not_watched = []
-        movies_user_has_watched = self.user_movies[current_user]
-        for movie in self.user_movies:
-            if movie not in movies_user_has_watched:
-                movies_not_watched.append(movie)
 
-        # get similarities between this user and the others
-        # they have to have euclidean_distance of >= .7
-        similarities = {}
-        for user in self.user_movies:
-            ratings = self.ratings_by_two(current_user, user)
-            eu_distance = self.euclidean_distance(ratings[0], ratings[1])
-            if eu_distance >= 0.5:
-                similarities[user]=eu_distance
-
-        # find movies watched by similar users, this user has not seen
-        # for each user
-        movies_to_recommend = {}
-        for user in similarities:
-            #for the movies they watched which ones this user has not seen
-            #such that similarity * rating >= 4
-            for movie_watched in self.user_movies[user]:
-                similar_by = similarities[user]*self.user_rate_data[user][movie_watched]
-                if movie_watched not in movies_not_watched and similar_by >= 4:
-                    if user in movies_to_recommend:
-                        movies_to_recommend[user].update({movie_watched:similar_by})
-                    else:
-                        movies_to_recommend[user] = {movie_watched:similar_by}
-
-        recommended_movies = []
-        for user, movies in movies_to_recommend.items():
-            for movie in movies:
-                if movie not in recommended_movies:
-                    recommended_movies.append(movie)
-                    print("{} : Rating {}".format(self.movie_title(movie), movies[movie] ))
-
-
-    def euclidean_distance(self,v, w):
-        """Given two lists, give the Euclidean distance between them on a scale
-        of 0 to 1. 1 means the two lists are identical.
-        """
-        # Guard against empty lists.
-        if len(v) is 0:
-            return 0
-
-        differences = [v[idx] - w[idx] for idx in range(len(v))]
-        squares = [diff ** 2 for diff in differences]
-        sum_of_squares = sum(squares)
-
-        return round(1 / (1 + math.sqrt(sum_of_squares)), 1)
 
 
 
 if __name__ == '__main__':
-    movie = MoviesData('data/u.data', 'data/u.item')
+    movie = MovieRecommender('data/u.data', 'data/u.item')
 
-    movie.movies_recommended_to_user(23)
+    movie.welcome()
+    choice = movie.get_user_choice()
+    movie.start_recommender(choice)
