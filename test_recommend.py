@@ -65,3 +65,23 @@ def test_movies_avg_rating():
     movies = Movie.load_movies('datasets/ml-100k/uhead.item')
     movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
     assert movies['7'].avg_rating == 3.6
+
+# def load_files():
+#     users = User.load_users('datasets/ml-100k/uhead.user')
+#     users = User.load_ratings('datasets/ml-100k/uhead.data', users)
+#     movies = Movie.load_movies('datasets/ml-100k/uhead.item')
+#     movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
+#     return users, movies
+
+def test_db_creation():
+    db = DataBase(users_file='datasets/ml-100k/uhead.user',
+                  movies_file='datasets/ml-100k/uhead.item',
+                  ratings_file='datasets/ml-100k/uhead.data')
+    assert db.users['1'].ratings['113'] == '5'
+    assert db.movies['7'].avg_rating == 3.6
+    assert db.movies['1'].movie_title == 'Toy Story (1995)'
+
+def test_top_n():
+#    users, movies = load_files()
+#    pprint(movies.top_n(n=20, min=2, user=None))
+    pass

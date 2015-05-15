@@ -1,9 +1,6 @@
 import csv
 import pprint
 
-users = {}
-movies = {}
-ratings = {}
 
 class User():
     def __init__(self, user_id='1', age='24', gender='M', job='technician', zipcode='85711'):
@@ -102,8 +99,22 @@ class Movie():
     def avg_rating(self):
         return sum([int(val) for val in self.ratings.values()]) / len(self.ratings)
 
+class DataBase():
+    def __init__(self, users_file, movies_file, ratings_file):
+        my_users = User.load_users(users_file)
+        my_users = User.load_ratings(ratings_file, my_users)
+        my_movies = Movie.load_movies(movies_file)
+        my_movies = Movie.load_ratings(ratings_file, my_movies)
+
+        self.users = my_users
+        self.movies = my_movies
+        #self.ratings = {}
+
+    def top_n(n=20, min=2, user=None):
+        pass
+
+
 if __name__ == '__main__':
-    users = User.load_users('datasets/ml-100k/uhead.user')
-    users = User.load_ratings('datasets/ml-100k/uhead.data', users)
-    movies = Movie.load_movies('datasets/ml-100k/uhead.item')
-    movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
+    db = DataBase(users_file='datasets/ml-100k/uhead.user',
+                  movies_file='datasets/ml-100k/uhead.item',
+                  ratings_file='datasets/ml-100k/uhead.data')
