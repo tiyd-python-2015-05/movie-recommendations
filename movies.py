@@ -162,8 +162,12 @@ def print_top_10():
 
 print_top_10()
 
-current_user_id = random.choice(list(user_dict.keys()))
-current_user = user_dict[current_user_id]
+while True:
+    current_user_id = random.choice(list(user_dict.keys()))
+    current_user = user_dict[current_user_id]
+    if len(current_user.rate_val) >= 3:
+        break
+
 exclude = True
 
 print(" ")
@@ -202,7 +206,10 @@ def pearson_product(v, w):
 
     cov = sum((x-v_avg)*(y-w_avg) for x, y in zip(v, w))
 
-    return cov/(v_std*w_std)
+    if v_std > 0 and w_std > 0:
+        return cov/(v_std*w_std)
+    else:
+        return 0
 
 def common_movies(user1, user2):
     indicies = []
@@ -238,3 +245,60 @@ for i in range(5):
 
     print(str(round(euclidean_distance(u1s, u2s),2)).rjust(6) +
           str(round(pearson_product(u1s, u2s),2)).rjust(6))
+
+def similar_users(u1_id):
+    u1 = user_dict[u1_id]
+    similar_ids = [0,0,0,0,0]
+    similar_sc  = [0,0,0,0,0]
+    for u2_id in user_dict.keys():
+        if u2_id != u1_id:
+            u2 = user_dict[u2_id]
+#            print(str(u2_id)+" "+str(len(u2.rate_val)))
+            u1s, u2s = common_movies(u1, u2)
+            score = pearson_product(u1s, u2s)
+            if score > min(similar_sc):
+                i = similar_sc.index(min(similar_sc))
+                similar_ids[i] = u2_id
+                similar_sc[i] = score
+    return similar_ids, similar_sc
+
+print(" ")
+print(" Top movies out of your history")
+print("                            Title              Score")
+
+personal_best = u1.rate_val
+personal_best = sorted(personal_best, key = personal_best.get, reverse=True)
+
+i_max = 5
+if len(personal_best) < 5:
+    i_max = len(personal_best)
+for i in range(i_max):
+    print(str(movie_dict[personal_best[i]]).rjust(50)+" "+
+          str(u1.rate_val[personal_best[i]]).rjust(6))
+
+print(" ")
+print(" Watch reccomendations based off similar users")
+print("                             Title             ")
+group_ids, group_scores = similar_users(current_user_id)
+
+movie_results = {}
+movie_ids = []
+movie_scores = []
+for i in range(len(group_ids)):
+    u2 = user_dict[group_ids[i]]
+    for m_id in u2.rate_val.keys():
+        if m_id not in u1.rate_val.keys():
+            movie_ids.append(m_id)
+            movie_scores.append(group_scores[i]*u2.rate_val[m_id])
+            movie_results[m_id] = group_scores[i]*u2.rate_val[m_id]
+
+
+results = sorted(movie_results, key=movie_results.get, reverse=True)
+
+i_max = 10
+if len(results) < 10:
+    i_len = len(results)
+for i in range(10):
+    print(str(movie_dict[results[i]]).rjust(50))
+
+print(" ")
