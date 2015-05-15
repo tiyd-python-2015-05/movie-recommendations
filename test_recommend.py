@@ -4,6 +4,7 @@ from pprint import pprint as pprint
 def test_user_creation():
     user = User(user_id='1', age='24', gender='M', job='technician', zipcode='85711')
     assert isinstance(user, User)
+    assert user.zipcode == '85711'
 
 def test_load_users():
     users = User.load_users('datasets/ml-100k/uhead.user')
@@ -12,7 +13,7 @@ def test_load_users():
     assert users['10'].zipcode == '90703'
 
 def test_load_ratings():
-    # cat u.data | egrep "^[1-9]\t" > uhead.data
+    # cat u.data ',' egrep "^[1-9]\t" > uhead.data
     users = User.load_users('datasets/ml-100k/uhead.user')
     users = User.load_ratings('datasets/ml-100k/uhead.data', users)
     assert len(users['1'].ratings) == 272
@@ -23,3 +24,21 @@ def test_user_movies_property():
     users = User.load_ratings('datasets/ml-100k/uhead.data', users)
     for item_id in ['236', '180', '17']:
         assert item_id in users['1'].movies
+
+def test_movie_creation():
+    fieldnames = \
+        ['movie_id', 'movie_title', 'release_date', 'video_release_date',
+        'IMDb_URL', 'unknown', 'Action', 'Adventure', 'Animation',
+        "Childrens", 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy',
+        'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'SciFi',
+        'Thriller', 'War', 'Western']
+
+    values = ['1','Toy Story (1995)','01-Jan-1995','','http://us.imdb.com/M/title-exact?Toy%20Story%20(1995)','0','0','0','1','1','1','0','0','0','0','0','0','0','0','0','0','0','0','0']
+    kwargs = dict(zip(fieldnames, values))
+    movie = Movie(**kwargs)
+    assert isinstance(movie, Movie)
+    print(dir(movie))
+    assert movie.movie_id == '1'
+    assert movie.Animation == '1'
+    assert movie.movie_title == 'Toy Story (1995)'
+    assert movie.Western == '0'
