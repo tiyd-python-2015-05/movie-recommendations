@@ -81,7 +81,10 @@ class Movie():
                 try:
                     movies[item_id].ratings[user_id] = rating
                 except KeyError:
-                    assert KeyError("That movie or user id does not exist")
+                    movies[item_id] = Movie(ratings={})
+                    movies[item_id].ratings[user_id] = rating
+
+                    #raise KeyError("That movie or user id does not exist")
         return movies
 
     @property
@@ -110,8 +113,21 @@ class DataBase():
         self.movies = my_movies
         #self.ratings = {}
 
-    def top_n(n=20, min=2, user=None):
-        pass
+    def top_n(self, n=20, min_n=2, user=None):
+        averages = {movie: self.movies[movie].avg_rating
+                    for movie in self.movies
+                    if self.movies[movie].num_ratings >= min_n}
+        self.averages = []
+        for item_id in sorted(averages, key=averages.get, reverse=True):
+            self.averages.append((item_id, averages[item_id]))
+
+        if user is None:
+            return self.averages[:n]
+        else:
+            num_ratings = len(self.users[user].ratings)
+            averages = self.averages[:n+num_ratings]
+            averages = [avg for avg in averages if avg[0] not in self.users[user].movies]
+            return averages[:n]
 
 
 if __name__ == '__main__':

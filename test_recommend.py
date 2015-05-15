@@ -1,6 +1,14 @@
 from recommend import *
 from pprint import pprint as pprint
 
+def test_data_files_are_present():
+    with open("datasets/ml-100k/u.data") as file:
+        assert file.readline()
+    with open("datasets/ml-100k/u.item") as file:
+        assert file.readline()
+    with open("datasets/ml-100k/u.user") as file:
+        assert file.readline()
+
 def test_user_creation():
     user = User(user_id='1', age='24', gender='M', job='technician', zipcode='85711')
     assert isinstance(user, User)
@@ -49,6 +57,8 @@ def test_load_movie_ratings():
     assert len(movies['7'].ratings) == 5
     pprint(movies['7'].ratings)
     assert movies['7'].ratings['9'] == '4'
+    #pprint(movies)
+    assert movies['127'].ratings['7'] == '5'
 
 def test_movies_users_property():
     movies = Movie.load_movies('datasets/ml-100k/uhead.item')
@@ -66,22 +76,54 @@ def test_movies_avg_rating():
     movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
     assert movies['7'].avg_rating == 3.6
 
-# def load_files():
+def load_files():
 #     users = User.load_users('datasets/ml-100k/uhead.user')
 #     users = User.load_ratings('datasets/ml-100k/uhead.data', users)
 #     movies = Movie.load_movies('datasets/ml-100k/uhead.item')
 #     movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
 #     return users, movies
-
-def test_db_creation():
     db = DataBase(users_file='datasets/ml-100k/uhead.user',
                   movies_file='datasets/ml-100k/uhead.item',
                   ratings_file='datasets/ml-100k/uhead.data')
+    return db
+
+def test_db_creation():
+    db = load_files()
     assert db.users['1'].ratings['113'] == '5'
     assert db.movies['7'].avg_rating == 3.6
     assert db.movies['1'].movie_title == 'Toy Story (1995)'
 
+# def test_db_avgs():
+#     db = load_files()
+#     for i in [('581', 5.0), ('313', 5.0), ('109', 5.0)]:
+#         assert i in db.averages
+
+
 def test_top_n():
-#    users, movies = load_files()
-#    pprint(movies.top_n(n=20, min=2, user=None))
-    pass
+    db = load_files()
+    assert db.top_n(n=20, min_n=2, user=None)[0][1] == 5.0
+    assert db.top_n(n=20, min_n=20, user=None) == []
+    assert len(db.top_n(n=20, min_n=2, user=None)) == 20
+    assert len(db.top_n(n=20, min_n=5, user=None)) == 14
+    rankings = db.top_n(n=10, min_n=3, user=None)
+    last = 5
+    for i in rankings:
+        assert last >= i[1]
+        last = i[1]
+
+def test_top_n_user():
+    db = load_files()
+    unfiltered = db.top_n(n=20, min_n=5, user=None)
+    tup_list = db.users['1'].movies
+    m_list = [m[0] for m in tup_list]
+    print(m_list)
+    filtered = db.top_n(n=20, min_n=4, user='1')
+    assert len(unfiltered) > len(filtered)
+    for (mov, avg) in filtered:
+        assert mov not in db.users['1'].movies
+
+"""
+943 users
+1682 items
+100000 ratings
+"""
