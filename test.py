@@ -1,5 +1,5 @@
 from movies import Frame
-from ratings_ui import Driver
+from driver import Driver
 
 from numbers import Number
 from math import sqrt

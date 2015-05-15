@@ -1,5 +1,4 @@
 from loader import load
-from movies import Frame
 
 from math import sqrt
 
@@ -56,8 +55,8 @@ class Driver:
         """
         users = self.frame.users()
         users.remove(user)  # recuse yourself
-        users = zip([user]*len(users), users)
-        users = [(user[1], distance(user)) for user in users]
+        users = zip([user]*len(users), users) # (user1, userN)
+        users = [(user[1], distance(user)) for user in users] # (userN, distance)
         users = sorted(users, key=lambda x: x[1])
         if len(users) > 5:
             users = users[:5]
@@ -66,17 +65,19 @@ class Driver:
     def find_rec(self, user, distance):
         users = self.find_closest(user, distance) # (user, similarity) top 5
         usr_movies = self.frame.movies_by_user(user)
+
         for item in users:
             movie = self.frame.movies_by_user(item[0]) # {movie: rating}
 
             movie = [(mov[0], mov[1]* item[1]) for mov in movie.items()
-                     if mov[0] not in usr_movies]
+                     if mov[0] not in usr_movies] # (movie, metric)
 
         if len(users) > 5:
-            movie = sorted(movie, key=lambda x: x[1])[:5] # top 5
+            movie = sorted(movie, key=lambda x: x[1])
         else:
             movie = sorted(movie, key=lambda x: x[1])
 
+        movie = movie[:5]
         movie = [self.frame.name_by_id(mov[0]) for mov in movie]
 
         return movie

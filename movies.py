@@ -7,12 +7,18 @@ class Frame:
             self.names = names
 
     def ratings_by_id(self, movie_id):
+        """
+        Returns a list all ratings for a given movie
+        """
         if movie_id in self.names:
             return [self.data[item] for item in self.data if item[1] == movie_id]
         else:
             return "No movies found with that ID"
 
     def average_by_id(self, movie_id):
+        """
+        calculates the average rating for a given movie
+        """
         if movie_id in self.names:
             return sum(self.ratings_by_id(movie_id)) \
                 / len(self.ratings_by_id(movie_id)), \
@@ -22,6 +28,10 @@ class Frame:
 
 
     def name_by_id(self, movie_id):
+        """
+        returns the name of the movie with the given ID if it is
+        in the movie list
+        """
         if movie_id in self.names:
             return self.names[movie_id]
 
@@ -48,11 +58,3 @@ class Frame:
 
     def users(self):
         return [name for name in {name[0] for name in self.data}]
-
-
-#if __name__ == '__main__':
-    #movie_titles, data = load()
-    #data = sort(data)
-    #frame = Frame(data, movie_titles)
-    #print('framed')
-    #print(frame.top_movies())
