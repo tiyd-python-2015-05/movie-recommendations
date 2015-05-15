@@ -34,22 +34,30 @@ def make_user_object_list(num_of_users, user_id_dict):
         user_object_list.append(users)
     return user_object_list
 
-def movie_sorted_list(m_list, rating_filter=5):
+def movie_sorted_list(m_list, rating_filter=5, length_list=20):
     sort_list = []
     for i in m_list:
         if len(i.movie_rating) >= rating_filter:
             sort_list.append(i)
     sort_list = sorted(sort_list, key=attrgetter("average_rating"), reverse=True)
     # double_sort_list = sorted(sort_list, key=attrgetter("movie_title"))
-    top_20 = sort_list[:21]
+    top_20 = sort_list[:length_list]
     return top_20
 
-def display_top_20():
+def display_top():
     m_list = startup()
     sorted_movies = movie_sorted_list(m_list)
     for i in range(len(sorted_movies)):
         print("Movie: {}, Rating: {}".format(sorted_movies[i].movie_title, \
-                                            sorted_movies[i].average_rating))
+                                        sorted_movies[i].average_rating))
+
+# def display_top_user_none():
+#     m_list = startup()
+#     sorted_movies = movie_sorted_list(m_list)
+#     sorted_user_none = if sorted_movies
+#     for i in range(len(sorted_movies)):
+#         print("Movie: {}, Rating: {}".format(sorted_movies[i].movie_title, \
+#                                         sorted_movies[i].average_rating))
 
 if __name__=='__main__':
-    print(display_top_20())
+    print(display_top())
