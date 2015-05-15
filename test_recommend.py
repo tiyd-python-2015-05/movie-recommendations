@@ -122,6 +122,19 @@ def test_top_n_user():
     for (mov, avg) in filtered:
         assert mov not in db.users['1'].movies
 
+def test_intersection():
+    db = load_files()
+    intersection = db.intersection('1', '2')
+    for movie in intersection:
+        assert movie in db.users['1'].movies
+        assert movie in db.users['2'].movies
+
+def test_euclidean_distance():
+    db = load_files()
+    dist = db.euclidean_distance('1', '2')
+    print(dist)
+    assert dist - 0.1613 < 0.01
+
 """
 943 users
 1682 items

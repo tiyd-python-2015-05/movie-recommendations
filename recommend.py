@@ -1,4 +1,5 @@
 import csv
+import math
 import pprint
 
 
@@ -42,6 +43,7 @@ class User():
     def movies(self):
         try:
             return [item_id for item_id in self.ratings]
+                          #sorted ... key=lambda x: x[1])
         except:
             assert KeyError("No movies found for this user")
 
@@ -102,6 +104,7 @@ class Movie():
     def avg_rating(self):
         return sum([int(val) for val in self.ratings.values()]) / len(self.ratings)
 
+
 class DataBase():
     def __init__(self, users_file, movies_file, ratings_file):
         my_users = User.load_users(users_file)
@@ -128,6 +131,39 @@ class DataBase():
             averages = self.averages[:n+num_ratings]
             averages = [avg for avg in averages if avg[0] not in self.users[user].movies]
             return averages[:n]
+    def intersection(self, me, them):
+        v = set(self.users[me].movies)
+        w = set(self.users[them].movies)
+        return list(v.intersection(w))
+        #return [x for x in self.users[me].movies]
+
+    def euclidean_distance(self, me, other):
+        """Given two lists, give the Euclidean distance between them on a scale
+        of 0 to 1. 1 means the two lists are identical.
+        """
+        s = self.users[me].ratings
+        o = self.users[other].ratings
+        ixn = self.intersection(me, other)
+
+        v = []
+        w = []
+
+        for movie in ixn:
+            #print(repr(movie))
+            #print(self.users[me].ratings[movie])
+            v.append(int(self.users[me].ratings[movie]))
+            w.append(int(self.users[other].ratings[movie]))
+
+        # Guard against empty lists.
+        if len(v) is 0:
+            return 0
+
+        # Note that this is the same as vector subtraction.
+        differences = [v[idx] - w[idx] for idx in range(len(v))]
+        squares = [diff ** 2 for diff in differences]
+        sum_of_squares = sum(squares)
+
+        return 1 / (1 + math.sqrt(sum_of_squares))
 
 
 if __name__ == '__main__':
