@@ -114,6 +114,7 @@ class DataBase():
 
         self.users = my_users
         self.movies = my_movies
+        self.similarities = {}
         #self.ratings = {}
 
     def top_n(self, n=20, min_n=2, user=None):
@@ -140,10 +141,12 @@ class DataBase():
     def euclidean_distance(self, me, other):
         """Given two lists, give the Euclidean distance between them on a scale
         of 0 to 1. 1 means the two lists are identical.
+        returns dictionary with {distance: and num_shared:}
         """
         s = self.users[me].ratings
         o = self.users[other].ratings
         ixn = self.intersection(me, other)
+        num_shared = len(ixn)
 
         v = []
         w = []
@@ -156,14 +159,38 @@ class DataBase():
 
         # Guard against empty lists.
         if len(v) is 0:
-            return 0
+            return {'dist': 0, 'num_shared': 0}
 
         # Note that this is the same as vector subtraction.
         differences = [v[idx] - w[idx] for idx in range(len(v))]
         squares = [diff ** 2 for diff in differences]
         sum_of_squares = sum(squares)
 
-        return 1 / (1 + math.sqrt(sum_of_squares))
+        return {'dist': 1 / (1 + math.sqrt(sum_of_squares)), 'num_shared': num_shared}
+
+    def calculate_similarities(self):
+        def calculate_pairings():
+            users = [user_id for user_id in self.users]
+
+            pairings = set()
+            for user1 in users:
+                for user2 in users:
+                    if user1 != user2:
+                        pairings.add(frozenset([user1, user2]))
+            return pairings
+
+        # for user in calculate_pairings():
+        #     print(user)
+        pairings =  calculate_pairings()
+
+        for pairing in pairings:
+            # There must be a better way to do this
+            pair = set(pairing)
+            user1 = pair.pop()
+            user2 = pair.pop()
+            self.similarities[(user1, user2)] = self.euclidean_distance(user1, user2)
+
+        return True
 
 
 if __name__ == '__main__':

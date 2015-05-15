@@ -135,6 +135,24 @@ def test_euclidean_distance():
     print(dist)
     assert dist - 0.1613 < 0.01
 
+def test_num_items_test_files():
+    db = load_files()
+    assert len(db.users) == 10
+    assert len(db.users['1'].ratings) == 272
+    assert len(db.movies) == 691
+
+def test_calculate_similarities():
+    db = load_files()
+    #pairings = db.calculate_similarities()
+    #print(pairings, '\n Length: ', len(pairings))
+    db.calculate_similarities()
+    pprint(db.similarities)
+    assert False
+# def test_number_of_entries():
+#     # Data from u.info
+#     db = load_files()
+#     assert len(db.users) == 943
+
 """
 943 users
 1682 items
