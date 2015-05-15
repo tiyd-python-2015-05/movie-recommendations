@@ -79,18 +79,18 @@ class MoviesData:
     def popular_movies(self, criteria):
         '''Return movies rated more than 20 times'''
 
-        popular_movies = {}
+        popular_movie = {}
         for movie in self.movie_rate_data:
             if len(self.movie_rate_data[movie]) >= criteria:
-                popular_movies[movie] = round(sum(self.movie_rate_data[movie])/len(self.movie_rate_data[movie]), 1)
-        return popular_movies
+                popular_movie[movie] = round(sum(self.movie_rate_data[movie])/len(self.movie_rate_data[movie]), 1)
+        return popular_movie
 
 
-    def popular_movies_not_rated_by_person(self, user_id):
+    def popular_movies_not_rated_by_person(self, user_id, criteria):
         '''Movies not rated by specific person'''
 
         not_rated_by = []
-        for movie in self.popular_movies():
+        for movie in self.popular_movies(criteria):
             if movie not in self.user_movies[user_id]:
                 not_rated_by.append(self.movie_title(movie).split(','))
             else:
@@ -151,12 +151,11 @@ class MoviesData:
                     else:
                         movies_to_recommend[user] = {movie_watched:similar_by}
 
-        recommended_movies = []
+        recommended_movies = {}
         for user, movies in movies_to_recommend.items():
             for movie in movies:
                 if movie not in recommended_movies:
-                    recommended_movies.append(movie)
-                    #print("{} : Rating {}".format(self.movie_title(movie), movies[movie] ))
+                    recommended_movies[movie] = movies[movie]
         return recommended_movies
 
     def euclidean_distance(self,v, w):

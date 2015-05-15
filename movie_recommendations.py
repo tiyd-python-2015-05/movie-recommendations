@@ -10,9 +10,7 @@ class MovieRecommender(MoviesData):
                3 - Check the name for the Movie ID you have\n \
                4 - See how a certain user (with USER ID) has rated several movies\n \
                5 - Want to see popular movies?\n \
-               6 - Want to see top movies that a certain user (USER ID) has not seen\n \
-               7 - Want to get similarities between two different users?\n \
-               8 - Want a suggestion for movies to watch that you have not watched\n")
+               6 - Want a suggestion for movies to watch that you have not watched\n")
 
         print("At any time, press 0 (zero) to quit")
 
@@ -59,9 +57,14 @@ class MovieRecommender(MoviesData):
             for movieid in pop_moview:
                 print("Title: {}\nAverage Rating: {}".format(self.movie_title(movieid), pop_moview[movieid]))
 
-
-
-
+        elif userchoice == 6:
+            print("We can recommend movies to your friend, even you for cool movies \
+                    they have'nt seen!")
+            userid = self.get_user_choice("What is the friend's ID?: ", "Please make sure you know their ID")
+            movies = self.movies_recommended_to_user(userid)
+            for movie in movies:
+                #print(movies)
+                print("Movie: {}\nRating {}".format(self.movie_title(movie), movies[movie]))
 
 
 
