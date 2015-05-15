@@ -44,15 +44,24 @@ def test_load_movies():
     assert movies['1'].Animation == '1'
 
 def test_load_movie_ratings():
-    # cat u.data ',' egrep "^[1-9]\t" > uhead.data
     movies = Movie.load_movies('datasets/ml-100k/uhead.item')
     movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
     assert len(movies['7'].ratings) == 5
     pprint(movies['7'].ratings)
     assert movies['7'].ratings['9'] == '4'
 
-def test_movies_user_property():
+def test_movies_users_property():
     movies = Movie.load_movies('datasets/ml-100k/uhead.item')
     movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
     for user_id in ['2', '6', '5', '1']:
         assert user_id in movies['1'].users
+
+def test_movies_num_ratings():
+    movies = Movie.load_movies('datasets/ml-100k/uhead.item')
+    movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
+    assert movies['1'].num_ratings == 4
+
+def test_movies_avg_rating():
+    movies = Movie.load_movies('datasets/ml-100k/uhead.item')
+    movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
+    assert movies['7'].avg_rating == 3.6

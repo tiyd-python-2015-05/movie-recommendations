@@ -94,6 +94,14 @@ class Movie():
         except:
             assert KeyError("No users found for this movie")
 
+    @property
+    def num_ratings(self):
+        return len(self.ratings)
+
+    @property
+    def avg_rating(self):
+        return sum([int(val) for val in self.ratings.values()]) / len(self.ratings)
+
 """
         with open(filename, encoding="windows-1252") as file:
             reader = csv.DictReader(file, delimiter='|', fieldnames=fieldnames)
@@ -103,3 +111,8 @@ class Movie():
                 movies.add_movie(**row)
             return movies
 """
+if __name__ == '__main__':
+    users = User.load_users('datasets/ml-100k/uhead.user')
+    users = User.load_ratings('datasets/ml-100k/uhead.data', users)
+    movies = Movie.load_movies('datasets/ml-100k/uhead.item')
+    movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
