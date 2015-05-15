@@ -26,3 +26,18 @@ def test_movie_average_review():
     assert m.movie_rating == [[534, 4], [222, 3], [265, 2]]
     m.make_movie_average_rating()
     assert m.average_rating == 3.0
+
+def test_make_user():
+    m = User(3)
+    assert isinstance(m, User)
+    assert m.user_id == 3
+
+ratings_dict_by_user = {1: [[345, 5], [546, 3], [765, 4]],
+                        2: [[42, 4]],
+                        3: [[654, 3], [543, 4]],
+                        4: [[545, 4], [234, 4], [333, 5], [654, 5], [333, 5]]}
+
+def test_make_user_ratings():
+    m = User(3)
+    m.make_ratings(ratings_dict_by_user)
+    assert m.rating_list == [[654, 3], [543, 4]]
