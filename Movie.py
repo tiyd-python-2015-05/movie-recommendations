@@ -1,6 +1,14 @@
+from math import sqrt
+
+
+class ShapeException(Exception):
+    pass
+
+
 class Movie:
     def __init__(self, movie_id):
         self.movie_id = movie_id
+        self.user_sim_dict = {}
 
     def __str__(self):
         return "For the movie {} the average rating is {}.".\
@@ -71,4 +79,19 @@ class User:
         return vector_self, vector_other
 
 
-    # def calculate_similarity(self, other):
+
+#this is outside the class
+def calculate_similarity(v1, v2):
+    """Given two lists, give the Euclidean distance between them on a scale
+    of 0 to 1. 1 means the two lists are identical.
+    """
+    # Guard against empty lists.
+    if len(v1) is 0:
+        return 0
+
+    # Note that this is the same as vector subtraction.
+    differences = [v1[i] - v2[i] for i in range(len(v1))]
+    squares = [diff ** 2 for diff in differences]
+    sum_of_squares = sum(squares)
+
+    return round(1 / (1 + sqrt(sum_of_squares)), 3)

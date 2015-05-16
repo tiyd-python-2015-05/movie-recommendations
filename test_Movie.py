@@ -104,14 +104,15 @@ def test_make_common_vectors():
     u.movies_reviewed()
     t.movies_reviewed()
     u.compare_user_reviews(t)
-    u.make_common_vectors(t)
     assert u.make_common_vectors(t) == ([3, 2, 5], [1, 1, 3])
+#go back and test shape exception in make_common_vectors
 
-v1 = [1, 2, 3, 4, 5, 6]
+v1 = [1, 2, 3, 4]
 v2 = [1, 2, 3, 4, 5, 6, 7, 8]
-v3 = [1, 2, 3, 4, 5, 6]
-v2 = [1, 2, 3, 4, 5, 6]
-v4 =
+v3 = [4, 3, 2, 1]
+v4 = []
+v5 = []
 
 def test_calculate_similarity():
-    assert calculate_similarity(v1, v2) = "Vectors are not the same length"
+    assert calculate_similarity(v4, v1) == 0
+    assert calculate_similarity(v1, v3) == 0.183
