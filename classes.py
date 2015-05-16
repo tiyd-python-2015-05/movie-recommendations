@@ -1,12 +1,13 @@
 from math import sqrt
+from operator import attrgetter, itemgetter
 
 class ShapeException(Exception):
     pass
 
-def calculate_similarity(vector1, vector2):
+def calculate_similarity(vector1, vector2, min_reviews_in_common=5):
     if len(vector1) != len(vector2):
         raise ShapeException("Vectors must be same shape.")
-    elif len(vector1) == 0:
+    elif len(vector1) < min_reviews_in_common:
         return 0
     else:
         differences = [vector1[i] - vector2[i] for i in range(len(vector1))]
@@ -114,6 +115,27 @@ class User:
         self.user_sim_dict[other.user_id] = similarity
         return similarity
         #need to return??
+
+    def create_top_users_in_common(self, length_list=3):
+        sort_dict = self.user_sim_dict
+        sort_list = sorted(sort_dict.items(), key=lambda x: x[1], reverse=True)
+        top = sort_list[0:length_list]
+        #this will return tuples of user and similarity score
+        return top
+
+    def movies_reviewed_not_seen(self, other, length_list=5):
+        uncommon_list = self.make_uncommon_reviews(other)
+        uncommon_dict = {}
+        for i in uncommon_list:
+            uncommon_dict[i] = other.ratings_dict[i]
+        sort_uncommon = sorted(uncommon_dict.items(), key=lambda x:x[1],
+                        reverse=True)
+
+        top = sort_list[0:length_list]
+        return top
+
+
+
 
 
 

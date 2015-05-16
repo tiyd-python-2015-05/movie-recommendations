@@ -63,6 +63,13 @@ def display_top_movies_not_reviewed(movie_list,user_id, len_list=2, min_rev=1):
     pass
 ##
 
+def display_user(user_id):
+    print("Welcome User {}".format(user_id))
+
+def find_most_similar(user_id, compare_id):
+    pass
+
+
 if __name__ == "__main__":
     m_list, u_list = startup()
     display_top_movies(m_list, 20, 5)
