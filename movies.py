@@ -12,6 +12,7 @@ class RatingException(Exception):
 exclude = False
 current_user = None
 use_1m = True
+use_pearson = True
 
 
 @functools.total_ordering
@@ -128,6 +129,15 @@ def fix_row(row):
             new_row.append(st)
     return new_row
 
+
+def sanitize_input(text):
+    val = input(text)
+    while len(val) < 1:
+        val = input(" please give a vaid selection, " + text)
+    val = val[0].lower()
+    return val
+
+
 def read_movie_file():
 
     user_key = ["user id", "item id", "rating", "timestamp"]
@@ -230,7 +240,10 @@ def similar_users(u1_id):
         if u2_id != u1_id:
             u2 = user_dict[u2_id]
             u12mid, u1s, u2s = common_movies(u1, u2)
-            score = pearson_product(u1s, u2s)
+            if use_pearson:
+                score = pearson_product(u1s, u2s)
+            else:
+                score = euclidean_distance(u1s, u2s)
             if score > min(similar_sc) and len(u1s) > 5:
                 i = similar_sc.index(min(similar_sc))
                 similar_ids[i] = u2_id
@@ -280,6 +293,83 @@ def print_random_10_users(user_dict):
         print(user_dict[tag])
 
 
+def print_top_10_exclude(movie_dict):
+    print(" ")
+    print(" We will now exclude movies watched by Mr./Mrs. "+
+           str(current_user_id))
+    print(str(current_user))
+
+    print_top_10_movies(movie_dict)
+
+
+
+def compare_random_users(user_dict):
+    print(" ")
+    print(" Comparing two random users")
+    print("  Euclidian    Pearson")
+
+    u1 = current_user
+
+    for i in range(5):
+
+        while True:
+            u2 = user_dict[random.choice(list(user_dict.keys()))]
+            if u1 != u2:
+                break
+        u12mid, u1s, u2s = common_movies(u1, u2)
+
+        print("user1: "+" ".join([str(u1s[i]) for i in range(len(u1s))]))
+        print("user2: "+" ".join([str(u2s[i]) for i in range(len(u2s))]))
+        print("correlation level: "+
+              str(round(euclidean_distance(u1s, u2s),2)).rjust(6) +
+              str(round(pearson_product(u1s, u2s),2)).rjust(6))
+
+
+def similarity_suggestions(movie_dict):
+
+    print(" ")
+    print(" Top movies out of your history")
+    print("                                  Title              Score")
+
+    u1 = current_user
+    personal_best = u1.rate_val
+    personal_best = sorted(personal_best, key = personal_best.get,
+                        reverse=True)
+
+    i_max = 5
+    if len(personal_best) < 5:
+        i_max = len(personal_best)
+    for i in range(i_max):
+        print(str(movie_dict[personal_best[i]]).rjust(50)+" "+
+              str(u1.rate_val[personal_best[i]]).rjust(6))
+
+    print(" ")
+    print(" Watch reccomendations based off similar users")
+    print("                                   Title             Score")
+    group_ids, group_scores = similar_users(current_user_id)
+
+    for i in range(len(group_ids)):
+        u2 = user_dict[group_ids[i]]
+        for m_id in u2.rate_val.keys():
+            if m_id not in u1.rate_val.keys():
+                the_score = group_scores[i]*u2.rate_val[m_id]
+                movie_dict[m_id].add_score(the_score)
+
+    top_scores = [0 for i in range(10)]
+    top_mid = [0 for i in range(10)]
+    for m_id in movie_dict:
+        the_score = movie_dict[m_id].suggest()
+        if the_score > min(top_scores):
+            i = top_scores.index(min(top_scores))
+            top_scores[i] = the_score
+            top_mid[i] = m_id
+
+    i_max = 10
+    for i in range(10):
+        if top_mid[i] != 0:
+            print(str(movie_dict[top_mid[i]]).rjust(50)+" "+
+                  str(round(top_scores[i],2)))
+
 # Math Functions
 def euclidean_distance(v, w):
     """Given two lists, give the Euclidean distance between them on a scale
@@ -319,97 +409,76 @@ def pearson_product(v, w):
 if __name__ == '__main__':
 
     # File Reading
+    print(" ")
+    sel = sanitize_input("Use database with 1 [M]illion or" + \
+                         " 100 [T]housand ratings")
+    if sel == "M":
+        use_1m = True
+    else:
+        use_1m = False
     movie_dict = read_movie_file()
-
-    # Demonstrate database - print 10 random movies with genres
-    print_random_10_movies(movie_dict)
 
     # Read user data
     user_dict = read_user_file()
 
-    print_random_10_users(user_dict)
-
-
-    print_top_10_movies(movie_dict)
-
     # Pick current user
-
     while True:
         current_user_id = random.choice(list(user_dict.keys()))
         current_user = user_dict[current_user_id]
         if len(current_user.rate_val) >= 5: # must have reviewed several
             break
-
     exclude = True
 
-    print(" ")
-    print(" We will now exclude movies watched by Mr./Mrs. "+
-           str(current_user_id))
-    print(str(current_user))
+    while True:
 
-    print_top_10_movies(movie_dict)
+        print(" ")
+        print(" ")
+        print("Data is loaded. What do you want to do with it?")
+        print(" current user is #" + str(current_user_id))
+        if use_pearson:
+            cor_text = "pearson correlation"
+        else:
+            cor_text = "euclidian distance"
+        print(" using similarity distance of " + cor_text)
+        print("  1: print 10 random movies")
+        print("  2: select user account by ID")
+        print("  3: view comparision to 5 random users")
+        print("  4: print top 10 overall movies")
+        print("  5: print top 10 overall movies unwatched by user")
+        print("  6: print 10 random users")
+        print("  7: view suggestions based on similar users")
+        print("  8: change the type of similarity distance calc")
+        print("  9: exit")
+        print(" ")
 
-    print(" ")
-    print(" Comparing two random users")
-    print("  Euclidian    Pearson")
+        val = int(sanitize_input(" enter selection: "))
 
-    u1 = current_user
+        if val == 1:
+            # Demonstrate database - print 10 random movies with genres
+            print_random_10_movies(movie_dict)
+        elif val == 2:
+            uid = int(input("\n enter user ID: "))
+            current_user_id = uid
+            current_user = user_dict[current_user_id]
+        elif val == 3:
+            compare_random_users(user_dict)
+        elif val == 4:
+            exclude = False
+            print_top_10_movies(movie_dict)
+            exclude = True
+        elif val == 5:
+            print_top_10_exclude(movie_dict)
+        elif val == 6:
+            print_random_10_users(user_dict)
+        elif val == 7:
+            similarity_suggestions(movie_dict)
+        elif val == 8:
+            if use_pearson:
+                use_pearson = False
+            else:
+                use_pearson = True
+        elif val == 9:
+            break
 
-    for i in range(5):
-
-        while True:
-            u2 = user_dict[random.choice(list(user_dict.keys()))]
-            if u1 != u2:
-                break
-        u12mid, u1s, u2s = common_movies(u1, u2)
-
-        print("user1: "+" ".join([str(u1s[i]) for i in range(len(u1s))]))
-        print("user2: "+" ".join([str(u2s[i]) for i in range(len(u2s))]))
-        print("correlation level: "+
-              str(round(euclidean_distance(u1s, u2s),2)).rjust(6) +
-              str(round(pearson_product(u1s, u2s),2)).rjust(6))
-
-
-    print(" ")
-    print(" Top movies out of your history")
-    print("                                  Title              Score")
-
-    personal_best = u1.rate_val
-    personal_best = sorted(personal_best, key = personal_best.get,
-                        reverse=True)
-
-    i_max = 5
-    if len(personal_best) < 5:
-        i_max = len(personal_best)
-    for i in range(i_max):
-        print(str(movie_dict[personal_best[i]]).rjust(50)+" "+
-              str(u1.rate_val[personal_best[i]]).rjust(6))
-
-    print(" ")
-    print(" Watch reccomendations based off similar users")
-    print("                                   Title             Score")
-    group_ids, group_scores = similar_users(current_user_id)
-
-    for i in range(len(group_ids)):
-        u2 = user_dict[group_ids[i]]
-        for m_id in u2.rate_val.keys():
-            if m_id not in u1.rate_val.keys():
-                the_score = group_scores[i]*u2.rate_val[m_id]
-                movie_dict[m_id].add_score(the_score)
-
-    top_scores = [0 for i in range(10)]
-    top_mid = [0 for i in range(10)]
-    for m_id in movie_dict:
-        the_score = movie_dict[m_id].suggest()
-        if the_score > min(top_scores):
-            i = top_scores.index(min(top_scores))
-            top_scores[i] = the_score
-            top_mid[i] = m_id
-
-    i_max = 10
-    for i in range(10):
-        if top_mid[i] != 0:
-            print(str(movie_dict[top_mid[i]]).rjust(50)+" "+
-                  str(round(top_scores[i],2)))
 
     print(" ")
