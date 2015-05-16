@@ -195,6 +195,42 @@ def test_recommend_simple():
     # assert False
     # User '1' has ratings for movies from 1 to 273
 
+def test_recommend_simple_5_users():
+    db = load_files(movies_file='datasets/ml-100k/u.item')
+    db.calculate_similarities()
+    kml = db.recommend('1', n=20, mode='simple', num_users=5)
+    pprint(db.translate(data=kml, fn=db.get_title))
+    # assert len(kml) == 20
+    my_movies = db.users['1'].movies
+    for mid, score in kml:
+        assert mid not in my_movies
+
+
+def test_recommend_simple_5_users_removes_dupes():
+    db = load_files(movies_file='datasets/ml-100k/u.item')
+    db.calculate_similarities()
+    rec = db.recommend('5', n=20, mode='simple', num_users=5)
+    movie_ids = [i[0] for i in rec]
+    my_movies = db.users['5'].movies
+    #pprint(movie_ids)
+    assert len(list(set(movie_ids))) == len(movie_ids)
+    for movie in movie_ids:
+        assert movie not in my_movies
+    pprint(db.translate(data=rec, fn=db.get_title))
+
+
+def test_sanity_check():
+    db = load_files(movies_file='datasets/ml-100k/u.item')
+    db.calculate_similarities()
+    user = '1'
+    db.users[user].sort_ratings()
+    rec = db.recommend(user, n=20, mode='simple', num_users=5)
+    #pprint(vars(db.users['5']))
+    print('Your favorite movies:\n', '*'*40)
+    pprint(db.translate(db.users[user].my_favorites(n=20), fn=db.get_title))
+    print('Your recommending movies:\n', '*'*40)
+    pprint(db.translate(rec, fn=db.get_title)) # TODO: Add decorator for translate?
+    assert True
 
     #assert False
 # def test_number_of_entries():

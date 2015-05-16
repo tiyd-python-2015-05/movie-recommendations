@@ -56,6 +56,11 @@ class User():
         self.sorted_ratings = sorted_ratings
         return sorted_ratings
 
+    def my_favorites(self, n=20):
+        return [(movie_id, self.ratings[movie_id])
+                for movie_id in self.sort_ratings()[:n]]
+
+
 class Movie():
     item_fieldnames = \
         ['movie_id', 'movie_title', 'release_date', 'video_release_date',
@@ -223,6 +228,10 @@ class DataBase():
             return self.movies[movie_id].movie_title
         except:
             return movie_id
+    def translate(self, data, fn):
+        """Returns passed list of 2-tuples with item[0] transformed with fn"""
+        return [(fn(item[0]), item[1]) for item in data]
+
     def recommend(self, user_id, n=5, mode='simple', num_users=1):
         if self.users[user_id].similar == None:
             self.similar(user_id, n=5, min_matches=3)
@@ -236,7 +245,16 @@ class DataBase():
                     top_movies.append((movie, similarity * int(rating)))
             top_movies.sort(key=lambda x: x[1], reverse=True)
             filtered = [(movie,score) for movie,score in top_movies if movie not in self.users[user_id].movies]
-            return filtered[:n]
+
+            def remove_dupes(a_list):
+                existing = []
+                output = []
+                for movie, score in a_list:
+                    if movie not in existing:
+                        output.append((movie, score))
+                return output
+
+            return filtered[:n] #remove_dupes(filtered)[:n]
 
 
             # return [self.get_title(mid)
