@@ -110,9 +110,48 @@ def test_make_common_vectors():
 v1 = [1, 2, 3, 4]
 v2 = [1, 2, 3, 4, 5, 6, 7, 8]
 v3 = [4, 3, 2, 1]
-v4 = []
-v5 = []
+v4 = [3, 2, 5]
+v5 = [1, 1, 3]
+v6 = []
 
 def test_calculate_similarity():
-    assert calculate_similarity(v4, v1) == 0
-    assert calculate_similarity(v1, v3) == 0.183
+    assert calculate_similarity(v6, v1, common=1) == 0
+    assert calculate_similarity(v1, v3, common=1) == 0.183
+    assert calculate_similarity(v4, v5, common=1) == 0.25
+
+def test_create_similarity():
+    u = User(1)
+    t = User(2)
+    u.rating_list(user_id_dict)
+    t.rating_list(user_id_dict)
+    u.rating_dict(user_id_dict)
+    t.rating_dict(user_id_dict)
+    u.movies_reviewed()
+    t.movies_reviewed()
+    u.compare_user_reviews(t)
+    u.make_common_vectors(t)
+    u.create_similarity(t)
+    assert u.user_sim_dict == {2: 0}
+
+def test_top_similar_users():
+    u = User(1)
+    u.user_sim_dict = {1: 0.1, 2: 0.2, 3: 1, 4: 0.4, 5: 0.5}
+    assert u.top_similar_users() == [(3, 1), (5, 0.5), (4, 0.4), (2, 0.2), (1, 0.1)]
+
+def test_movies_not_seen():
+    u = User(1)
+    t = User(2)
+    t.user_rating_dict = {15: 1, 16: 2, 17: 3, 18: 4, 19: 5, 20: 1}
+    u.not_in_common_movies = [15, 16, 17, 18, 20]
+    u.movies_not_seen(t)
+    assert u.uncommon_dict == {15: 1, 16: 2, 17: 3, 18: 4, 20: 1}
+
+    #{18: 4, 17: 3, 16: 2, 15: 1}
+
+def test_top_similar_movies():
+    u = User(1)
+    t = User(2)
+    t.user_rating_dict = {15: 1, 16: 2, 17: 3, 18: 4, 19: 5, 20: 1, 21: 3.5}
+    u.not_in_common_movies = [15, 16, 17, 18, 20, 21]
+    u.movies_not_seen(t)
+    assert u.top_similar_movies(t) == [18, 21, 17, 16, 20]

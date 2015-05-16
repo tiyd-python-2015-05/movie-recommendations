@@ -1,4 +1,5 @@
 from math import sqrt
+from operator import attrgetter, itemgetter
 
 
 class ShapeException(Exception):
@@ -8,7 +9,6 @@ class ShapeException(Exception):
 class Movie:
     def __init__(self, movie_id):
         self.movie_id = movie_id
-        self.user_sim_dict = {}
 
     def __str__(self):
         return "For the movie {} the average rating is {}.".\
@@ -29,6 +29,7 @@ class Movie:
 class User:
     def __init__(self, user_id):
         self.user_id = user_id
+        self.user_sim_dict = {}
 
     def rating_list(self, user_id_dict):
         self.user_rating = user_id_dict[self.user_id]
@@ -78,15 +79,38 @@ class User:
             vector_other.append(other.user_rating_dict[i])
         return vector_self, vector_other
 
+    def create_similarity(self, other):
+        v1, v2 = self.make_common_vectors(other)
+        similarity = calculate_similarity(v1, v2)
+        self.user_sim_dict.setdefault(other.user_id, similarity)
+
+    def top_similar_users(self):
+        sorted_list = sorted(self.user_sim_dict.items(), key=lambda x: x[1], reverse=True)
+        self.top_similar_users = sorted_list
+        return self.top_similar_users
+
+    def movies_not_seen(self, other):
+        self.uncommon_dict = {}
+        for i in self.not_in_common_movies:
+            self.uncommon_dict.setdefault(i, other.user_rating_dict[i])
+
+    def top_similar_movies(self, other, length=5):
+        #prints as a list of tuples
+        top_uncommon_movies = sorted(self.uncommon_dict.items(),\
+                                     key=lambda x: x[1], reverse=True)
+        #calling 0-6 will give key of tuples
+        top_uncommon_movies_list = [top_uncommon_movies[i][0] for i in range(length)]
+        return top_uncommon_movies_list
+
 
 
 #this is outside the class
-def calculate_similarity(v1, v2):
+def calculate_similarity(v1, v2, common=5):
     """Given two lists, give the Euclidean distance between them on a scale
     of 0 to 1. 1 means the two lists are identical.
     """
     # Guard against empty lists.
-    if len(v1) is 0:
+    if len(v1) <= common:
         return 0
 
     # Note that this is the same as vector subtraction.
