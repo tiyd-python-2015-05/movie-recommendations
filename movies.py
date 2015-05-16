@@ -61,11 +61,11 @@ class Movie:
 
     def avg_cutoff(self):
         lval = self.list_scores()
-        ans = sum(lval)/len(lval)
         if len(lval) < 5:  # few reviews, send to bottom of list
             return 0
         if exclude and self.idVal in current_user.rate_val.keys():
             return 0
+        ans = sum(lval)/len(lval)
         return ans
 
     def add_score(self, a_score):
@@ -115,6 +115,19 @@ class User:
 
 # ~~~~~~ Function Definitions ~~~~~~~
 
+def fix_row(row):
+    '''csv reader will not accept multiple character delimeter
+       so this is a band-aid fix to sanitize a row with corrupted
+       characters'''
+    store = row
+    for i in range(len(store)):
+        store[i].replace(":", "")
+    new_row = []
+    for st in store:
+        if len(st) > 0:
+            new_row.append(st)
+    return new_row
+
 def read_movie_file():
 
     user_key = ["user id", "item id", "rating", "timestamp"]
@@ -134,25 +147,39 @@ def read_movie_file():
         d_key = "|"
     else:
         file_name = file_1m
-        d_key = "::"
+        d_key = ":"
     with open(file_name) as file:
-        reader = csv.reader(file, delimiter="|")
+        reader = csv.reader(file, delimiter=d_key)
         for row in reader:
             props_dict = {}
-            for i in range(len(movie_key)):
-                props_dict[movie_key[i]] = row[i]
-            movie_id    = int(props_dict["movie id"])
-            movie_title = props_dict["movie title"]
-            movie_date  = props_dict["release date"]
-            movie_vid   = props_dict["video release date"]
-            movie_url   = props_dict["IMDb URL"]
+            if use_1m:
+                row = fix_row(row)
+#                for i in range(len(row)):
+#                    row[i] = row[i].replace(":", "")
+                movie_id = int(row[0])
+                movie_title = row[1]
+                movie_date = ""
+                movie_vid = ""
+                movie_url = ""
+            else:
+                for i in range(len(movie_key)):
+                    props_dict[movie_key[i]] = row[i]
+                movie_id    = int(props_dict["movie id"])
+                movie_title = props_dict["movie title"]
+                movie_date  = props_dict["release date"]
+                movie_vid   = props_dict["video release date"]
+                movie_url   = props_dict["IMDb URL"]
 
             movie = Movie(movie_id, movie_title, movie_date,
                           movie_vid, movie_url)
-            for i in range(5,len(props_dict)):
-                if int(row[i]) == 1:
-                    movie.add_genre(movie_key[i])
-            movie_dict[int(props_dict["movie id"])] = movie
+            if use_1m:
+                for i in range(2,len(row)):
+                    movie.add_genre(row[i])
+            else:
+                for i in range(5,len(props_dict)):
+                    if int(row[i]) == 1:
+                        movie.add_genre(movie_key[i])
+            movie_dict[movie_id] = movie
 
     return movie_dict
 
@@ -167,10 +194,17 @@ def read_user_file():
         d_key = "\t"
     else:
         file_name = file_1m
-        d_key = "::"
+        d_key = ":"
     with open(file_name) as file:
         reader = csv.reader(file, delimiter=d_key)
         for row in reader:
+            if use_1m:
+                row = fix_row(row)
+#                store = row
+#                row = []
+#                for st in store:
+#                    if len(st)>0:
+#                        row.append(st)
             user_vals = [int(x) for x in row]
             user_id     = user_vals[0]
             movie_id    = user_vals[1]
@@ -303,7 +337,7 @@ if __name__ == '__main__':
     while True:
         current_user_id = random.choice(list(user_dict.keys()))
         current_user = user_dict[current_user_id]
-        if len(current_user.rate_val) >= 3: # must have reviewed several
+        if len(current_user.rate_val) >= 5: # must have reviewed several
             break
 
     exclude = True
