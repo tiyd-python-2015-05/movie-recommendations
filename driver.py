@@ -1,7 +1,6 @@
-from loader import load
-
 from math import sqrt
 from operator import itemgetter
+
 
 class Driver:
 
@@ -20,6 +19,7 @@ class Driver:
     #                              for movie in self.m_pairs}
     #    self.movie_p_distances = {movie: self.movie_p_distance(movie)
     #                              for movie in self.m_pairs}
+
     @property
     def e_distance(self):
         """
@@ -27,8 +27,9 @@ class Driver:
         for distance between users
         by ratings of common movies
         """
+
         def distance(*users):
-            user1 = self.frame.movies_by_user(users[0])
+            user1 = self.frame.movies_by_user(users[0])  # movie, rating pairs
             user2 = self.frame.movies_by_user(users[1])
             common = [item for item in user1 if item in user2]
 
@@ -49,6 +50,7 @@ class Driver:
         between the two users by ratings
         of common movies
         """
+
         def distance(*users):
             user1 = self.frame.movies_by_user(users[0])
             user2 = self.frame.movies_by_user(users[1])
@@ -62,8 +64,9 @@ class Driver:
                 diff2 = map(lambda x: (user2[x] - user2_mean)**2, common)
                 sds = sqrt(sum(diff1)*sum(diff2)) * len(common)**2
 
-                common = map(lambda x: (user1[x] - user1_mean)*(user2[x]-user2_mean)
-                            / (sds), common)
+                common = map(lambda x: (user1[x] -
+                                        user1_mean)*(user2[x]-user2_mean)
+                             / (sds), common)
                 return sum(common)
             else:
                 return 0
@@ -91,16 +94,16 @@ class Driver:
         using the given distance function
         to find users most similar
         """
-        users = self.find_closest(user, distance) # (user, similarity) top 5
+        users = self.find_closest(user, distance)  # (user, similarity) top 5
         usr_movies = self.frame.movies_by_user(user)
 
         movie = {}
         movies = []
         for item in users:
-            movie.update(self.frame.movies_by_user(item[0])) # {movie: rating}
+            movie.update(self.frame.movies_by_user(item[0]))  # {movie: rating}
 
-            movies.extend([(mov[0], mov[1]* item[1]) for mov in movie.items()
-                      if mov[0] not in usr_movies]) # (movie, metric)
+            movies.extend([(mov[0], mov[1] * item[1]) for mov in movie.items()
+                          if mov[0] not in usr_movies])  # (movie, metric)
 
         if len(users) > 5:
             movies = sorted(movies, key=lambda x: x[1])
@@ -114,11 +117,12 @@ class Driver:
 
     @property
     def movie_e_distance(self):
-            """
-            returns a Euclidean distance function
-            for distance between movies
-            by ratings from common users
-            """
+        """
+        returns a Euclidean distance function
+        for distance between movies
+        by ratings from common users
+        """
+
         def distance(movies):
             movie1 = self.frame.users_by_movie(movies[0])
             movie2 = self.frame.users_by_movie(movies[1])
@@ -141,6 +145,7 @@ class Driver:
         between the two movies by ratings
         from common users
         """
+
         def distance(movies):
             movie1 = self.frame.movies_by_user(movies[0])
             movie2 = self.frame.movies_by_user(movies[1])
@@ -154,8 +159,9 @@ class Driver:
                 diff2 = map(lambda x: (movie2[x] - movie2_mean)**2, common)
                 sds = sqrt(sum(diff1)*sum(diff2)) * len(common)**2
 
-                common = map(lambda x: (movie1[x] - movie1_mean)*(movie2[x]-movie2_mean)
-                            / (sds), common)
+                common = map(lambda x: (movie1[x] -
+                                        movie1_mean)*(movie2[x]-movie2_mean)
+                             / (sds), common)
                 return sum(common)
             else:
                 return 0
@@ -170,8 +176,8 @@ class Driver:
         movies = list(self.frame.names.keys())
         movies.remove(movie)  # recuse yourself
         movies = zip([movie]*len(movies), movies)
-        movies = [(movie[1], distance(movie)) for movie in movies]
+        movies = [(mov[1], distance(mov)) for mov in movies]
         movies = sorted(movies, key=lambda x: x[1])
         if len(movies) > 5:
             movies = movies[:5]
-        return [self.frame.names[movie[0]] for movie in movies]
+        return [self.frame.names[mov[0]] for mov in movies]
