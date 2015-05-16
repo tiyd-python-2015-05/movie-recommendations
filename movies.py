@@ -267,6 +267,27 @@ def common_movies(user1, user2):
     return indicies, u1_stars, u2_stars
 
 
+def search_for_movie(movie_dict):    
+    print(" ")
+    text = input(" type string to search for:  ")
+    while True:
+        movie_ids = []
+        for tag in movie_dict.keys():
+            if text.lower() in (movie_dict[tag].title).lower():
+                movie_ids.append(tag)
+        i_max = 10
+        if len(movie_ids) < 10:
+            i_max = len(movie_ids)
+        for i in range(i_max):
+            print(str(i+1)+" "+str(movie_dict[movie_ids[i]]))
+        print(" ")
+        text = input(" make a selection or type a new search: ")
+        if text[0].isdigit():
+            break
+    return movie_ids[i-1]
+    print(" ")
+
+
 # Printing Functions
 def print_top_10_movies(movie_dict):
     print(" ")
@@ -413,7 +434,7 @@ if __name__ == '__main__':
     # File Reading
     print(" ")
     sel = sanitize_input("Use database with 1 [M]illion or" +
-                         " 100 [T]housand ratings")
+                         " 100 [T]housand ratings: ")
     if sel == "M":
         use_1m = True
     else:
@@ -430,6 +451,9 @@ if __name__ == '__main__':
         if len(current_user.rate_val) >= 5:  # must have reviewed several
             break
     exclude = True
+    # Pick current movie
+    current_movie_id = random.choice(list(movie_dict.keys()))
+    current_movie = movie_dict[current_movie_id]
 
     while True:
 
@@ -437,6 +461,7 @@ if __name__ == '__main__':
         print(" ")
         print("Data is loaded. What do you want to do with it?")
         print(" current user is #" + str(current_user_id))
+        print(" current movie is '" + str(current_movie)+"'")
         if use_pearson:
             cor_text = "pearson correlation"
         else:
@@ -450,36 +475,40 @@ if __name__ == '__main__':
         print("  6: print 10 random users")
         print("  7: view suggestions based on similar users")
         print("  8: change the type of similarity distance calc")
-        print("  9: exit")
+        print("  9: change movie by searching")
+        print("  e: exit")
         print(" ")
 
-        val = int(sanitize_input(" enter selection: "))
+        val = sanitize_input(" enter selection: ")
 
-        if val == 1:
+        if val == "1":
             # Demonstrate database - print 10 random movies with genres
             print_random_10_movies(movie_dict)
-        elif val == 2:
+        elif val == "2":
             uid = int(input("\n enter user ID: "))
             current_user_id = uid
             current_user = user_dict[current_user_id]
-        elif val == 3:
+        elif val == "3":
             compare_random_users(user_dict)
-        elif val == 4:
+        elif val == "4":
             exclude = False
             print_top_10_movies(movie_dict)
             exclude = True
-        elif val == 5:
+        elif val == "5":
             print_top_10_exclude(movie_dict)
-        elif val == 6:
+        elif val == "6":
             print_random_10_users(user_dict)
-        elif val == 7:
+        elif val == "7":
             similarity_suggestions(movie_dict)
-        elif val == 8:
+        elif val == "8":
             if use_pearson:
                 use_pearson = False
             else:
                 use_pearson = True
-        elif val == 9:
+        elif val == "9":
+            current_movie_id = search_for_movie(movie_dict)
+            current_movie = movie_dict[current_movie_id]
+        elif val == "e":
             break
 
     print(" ")
