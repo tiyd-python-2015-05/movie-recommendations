@@ -13,6 +13,8 @@ class User():
         self.job = job
         self.zipcode = zipcode
         self.ratings = {}
+        self.sorted_ratings = []
+        self.similar = None
         #self.movies = []
 
     @classmethod
@@ -48,6 +50,11 @@ class User():
                           #sorted ... key=lambda x: x[1])
         except:
             assert KeyError("No movies found for this user")
+    def sort_ratings(self):
+        """ """
+        sorted_ratings = sorted(self.ratings, key=self.ratings.get, reverse=True)
+        self.sorted_ratings = sorted_ratings
+        return sorted_ratings
 
 class Movie():
     item_fieldnames = \
@@ -196,7 +203,7 @@ class DataBase():
 
         return True
 
-    def similar(self, me, other, n=5, min_matches=3):
+    def similar(self, me, n=5, min_matches=3):
         rankings = {}
         if self.similarities is None:
             assert DBError('The similarity scores have not been calculated yet for this database')
@@ -208,7 +215,35 @@ class DataBase():
         rankings = {user: rankings[user]['dist'] for user in rankings
                     if rankings[user]['num_shared'] >= n }
         rankings = sorted(rankings.items(), key=lambda x: x[1], reverse=True)[:n]
+        self.users[me].similar = rankings
         return rankings
+
+    def get_title(self, movie_id):
+        try:
+            return self.movies[movie_id].movie_title
+        except:
+            return movie_id
+    def recommend(self, user_id, n=5, mode='simple', num_users=1):
+        if self.users[user_id].similar == None:
+            self.similar(user_id, n=5, min_matches=3)
+        if mode=='simple': # Return top n rated movies from most similar user
+            top_matching_users = self.users[user_id].similar[:num_users]
+            top_movies = []
+            for user, similarity in top_matching_users:
+                for movie, rating in self.users[user].ratings.items():
+                    # print('user:{}, similarity:{}, movie:{}, rating:{}'.format(
+                    #        user, similarity, movie, rating))
+                    top_movies.append((movie, similarity * int(rating)))
+            top_movies.sort(key=lambda x: x[1], reverse=True)
+            filtered = [(movie,score) for movie,score in top_movies if movie not in self.users[user_id].movies]
+            return filtered[:n]
+
+
+            # return [self.get_title(mid)
+            #         for mid in self.users[top_matching_user].sort_ratings()
+            #         if mid not in self.users[user_id].movies
+            #         ][:n]
+
 
 if __name__ == '__main__':
     db = DataBase(users_file='datasets/ml-100k/uhead.user',

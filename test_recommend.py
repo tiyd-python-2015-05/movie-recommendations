@@ -76,14 +76,14 @@ def test_movies_avg_rating():
     movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
     assert movies['7'].avg_rating == 3.6
 
-def load_files():
+def load_files(movies_file='datasets/ml-100k/uhead.item'):
 #     users = User.load_users('datasets/ml-100k/uhead.user')
 #     users = User.load_ratings('datasets/ml-100k/uhead.data', users)
 #     movies = Movie.load_movies('datasets/ml-100k/uhead.item')
 #     movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
 #     return users, movies
     db = DataBase(users_file='datasets/ml-100k/uhead.user',
-                  movies_file='datasets/ml-100k/uhead.item',
+                  movies_file=movies_file,
                   ratings_file='datasets/ml-100k/uhead.data')
     return db
 
@@ -110,17 +110,27 @@ def test_top_n():
     for i in rankings:
         assert last >= i[1]
         last = i[1]
+    ### Debug display:
+    for (movie_id, rating) in (db.top_n()):
+        print("{}\t\tAvg Rating: {}".format(db.get_title(movie_id), rating))
+    assert True
 
 def test_top_n_user():
     db = load_files()
     unfiltered = db.top_n(n=20, min_n=5, user=None)
     tup_list = db.users['1'].movies
     m_list = [m[0] for m in tup_list]
-    print(m_list)
+    #print(m_list)
     filtered = db.top_n(n=20, min_n=4, user='1')
     assert len(unfiltered) > len(filtered)
     for (mov, avg) in filtered:
         assert mov not in db.users['1'].movies
+
+    ### Debug display:
+    for (movie_id, rating) in (db.top_n(user='1')):
+        print("{}\t\tAvg Rating: {}".format(db.get_title(movie_id), rating))
+    print('User 1 has seen: {}'.format(sorted(db.users['1'].movies, key=int)))
+    assert True
 
 def test_intersection():
     db = load_files()
@@ -153,11 +163,39 @@ def test_calculate_similarities():
     except:
         assert db.similarities[('8','9')]['dist'] - 0.1907 < 0.01
         assert db.similarities[('8','9')]['num_shared'] == 4
-    
+
 def test_similar_users():
     db = load_files()
     db.calculate_similarities()
-    pprint(db.similar('2','1', n=5, min_matches=3))
+    assert (db.similar('2', n=5, min_matches=3))[0][0] == '5'
+    print(db.similar('2'))
+    assert True
+
+def test_get_title():
+    db = load_files()
+    assert db.get_title('1') == 'Toy Story (1995)'
+
+def test_sorted_ratings():
+    db = load_files()
+    srtd_ratings = db.users['1'].sort_ratings()
+    print(srtd_ratings)
+    assert True
+
+def test_recommend_simple():
+    db = load_files(movies_file='datasets/ml-100k/u.item')
+    db.calculate_similarities()
+    kml = db.recommend('1', n=20, mode='simple')
+    pprint(kml)
+    # assert len(kml) == 20
+    # my_titles = [db.get_title(mid) for mid in db.users['1'].movies]
+    my_movies = db.users['1'].movies
+    # print('User 1 has seen {}'.format(sorted(my_movies, key=int)))
+    for mid, score in kml:
+        assert mid not in my_movies
+    # assert False
+    # User '1' has ratings for movies from 1 to 273
+
+
     #assert False
 # def test_number_of_entries():
 #     # Data from u.info
@@ -169,3 +207,4 @@ def test_similar_users():
 1682 items
 100000 ratings
 """
+##timeit test for db loading speed of full dataset
