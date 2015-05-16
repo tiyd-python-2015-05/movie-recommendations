@@ -1,7 +1,7 @@
 from loader import load
 
 from math import sqrt
-
+from operator import itemgetter
 
 class Driver:
 
@@ -22,6 +22,11 @@ class Driver:
     #                              for movie in self.m_pairs}
     @property
     def e_distance(self):
+        """
+        returns a Euclidean distance function
+        for distance between users
+        by ratings of common movies
+        """
         def distance(*users):
             user1 = self.frame.movies_by_user(users[0])
             user2 = self.frame.movies_by_user(users[1])
@@ -38,6 +43,12 @@ class Driver:
 
     @property
     def p_distance(self):
+        """
+        returns a function that calculates
+        the Pearson correlation coefficient
+        between the two users by ratings
+        of common movies
+        """
         def distance(*users):
             user1 = self.frame.movies_by_user(users[0])
             user2 = self.frame.movies_by_user(users[1])
@@ -65,15 +76,21 @@ class Driver:
         returns as list of
         (user_id, distance)
         """
-        users = self.frame.users
-        users.remove(user)  # recuse yourself
-        users = [(other, distance(user, other)) for other in users] # (userN, distance)
-        users = sorted(users, key=lambda x: x[1])
+        users_list = self.frame.users[:]
+        users_list.remove(user)  # recuse yourself
+        users = [(other, distance(user, other)) for other in users_list]
+        users = sorted(users, key=itemgetter(1))
         if len(users) > 5:
             users = users[:5]
         return users
 
     def find_rec_user(self, user, distance):
+        """
+        returns five recommendations for a user
+        that they have not rated by
+        using the given distance function
+        to find users most similar
+        """
         users = self.find_closest(user, distance) # (user, similarity) top 5
         usr_movies = self.frame.movies_by_user(user)
 
@@ -97,6 +114,11 @@ class Driver:
 
     @property
     def movie_e_distance(self):
+            """
+            returns a Euclidean distance function
+            for distance between movies
+            by ratings from common users
+            """
         def distance(movies):
             movie1 = self.frame.users_by_movie(movies[0])
             movie2 = self.frame.users_by_movie(movies[1])
@@ -113,6 +135,12 @@ class Driver:
 
     @property
     def movie_p_distance(self):
+        """
+        returns a function that calculates
+        the Pearson correlation coefficient
+        between the two movies by ratings
+        from common users
+        """
         def distance(movies):
             movie1 = self.frame.movies_by_user(movies[0])
             movie2 = self.frame.movies_by_user(movies[1])
@@ -136,9 +164,8 @@ class Driver:
 
     def find_closest_movies(self, movie, distance):
         """
-        finds 5 closest movies
-        returns as list of
-        (umovie_id, distance)
+        finds 5 closest movies to a given movie
+        returns as list of (umovie_id, distance)
         """
         movies = list(self.frame.names.keys())
         movies.remove(movie)  # recuse yourself
