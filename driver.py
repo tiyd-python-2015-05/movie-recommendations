@@ -7,10 +7,22 @@ class Driver:
 
     def __init__(self, frame):
         self.frame = frame
-
+        # trying various things to speed up
+    #    self.u_pairs = {frozenset([item1, item2]) for item1
+    #                    in self.frame.users for item2 in self.frame.users}
+    #    self.m_pairs =  {frozenset([item1, item2]) for item1
+    #                    in self.frame.names for item2 in self.frame.names}
+    #    self.e_distances = {user: self.e_distance(user)
+    #                        for user in self.u_pairs}
+    #    self.p_distances = {user: self.p_distance(user)
+    #                        for user in self.u_pairs}
+    #    self.movie_e_distances = {movie: self.movie_e_distance(movie)
+    #                              for movie in self.m_pairs}
+    #    self.movie_p_distances = {movie: self.movie_p_distance(movie)
+    #                              for movie in self.m_pairs}
     @property
     def e_distance(self):
-        def distance(users):
+        def distance(*users):
             user1 = self.frame.movies_by_user(users[0])
             user2 = self.frame.movies_by_user(users[1])
             common = [item for item in user1 if item in user2]
@@ -26,7 +38,7 @@ class Driver:
 
     @property
     def p_distance(self):
-        def distance(users):
+        def distance(*users):
             user1 = self.frame.movies_by_user(users[0])
             user2 = self.frame.movies_by_user(users[1])
             common = [item for item in user1 if item in user2]
@@ -53,10 +65,9 @@ class Driver:
         returns as list of
         (user_id, distance)
         """
-        users = self.frame.users()
+        users = self.frame.users
         users.remove(user)  # recuse yourself
-        users = zip([user]*len(users), users) # (user1, userN)
-        users = [(user[1], distance(user)) for user in users] # (userN, distance)
+        users = [(other, distance(user, other)) for other in users] # (userN, distance)
         users = sorted(users, key=lambda x: x[1])
         if len(users) > 5:
             users = users[:5]

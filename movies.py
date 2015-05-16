@@ -56,6 +56,7 @@ class Frame:
         return {item[1]: self.data[item] for item
                 in self.data if item[0] == user_id}
 
+    @property
     def users(self):
         return [name for name in {name[0] for name in self.data}]
 

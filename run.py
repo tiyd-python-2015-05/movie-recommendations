@@ -33,15 +33,16 @@ class Run:
 
             if inp.lower()[0] == 'a':
                 inp = input("Movie ID: ")
-                if isinstance(inp, int):
+                if inp.isdigit():
                     os.system('clear')
-                    print(self.movies_id(inp))
+                    print(self.movies_id(int(inp)))
 
             if inp.lower()[0] == 'b':
                 inp = input("Movie ID: ")
-                os.system('clear')
-                if isinstane(inp, int):
-                    print(self.avg_rating(inp))
+                if inp.isdigit():
+                    os.system('clear')
+                    print(round(self.avg_rating(int(inp)), 2))
+
 
             if inp.lower()[0] == 't':
                 os.system('clear')
@@ -69,29 +70,29 @@ class Run:
 
 
     def print_users(self):
-        print([random.choice(self.frame.users()) for _ in range(5)])
+        print([random.choice(self.frame.users) for _ in range(5)])
 
     def movies_id(self, mid):
-        self.frame.name_by_id(mid)
+        return self.frame.name_by_id(mid)
 
     def avg_rating(self, mid):
-        print(self.frame.average_by_id(mid))
+        return self.frame.average_by_id(mid)[0]
 
     def distance(self):
         uid = input("User ID: ")
-        distance = input("By what metric? (E)uclidean, (P)earson: ").lower()[0]
-        while distance != 'e' and distance != 'p':
-            distance = input("By what metric? (E)uclidean, (P)earson: ").lower()[0]
+        dist = input("By what metric? (E)uclidean, (P)earson: ").lower()[0]
+        while dist != 'e' and dist != 'p':
+            dist = input("By what metric? (E)uclidean, (P)earson: ").lower()[0]
 
-        if distance == 'e':
-            distance = self.driver.e_distance
+        if dist == 'e':
+            dist = self.driver.e_distance
         else:
-            distance = self.driver.p_distance
+            dist = self.driver.p_distance
 
         if uid.isdigit():
             os.system('clear')
             print("Closest users to user {}:".format(uid))
-            print(self.driver.find_closest(int(uid), distance))
+            print(self.driver.find_closest(int(uid), dist)[0])
         else:
             print("No user with that ID found")
 
