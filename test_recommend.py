@@ -230,7 +230,7 @@ def test_sanity_check():
     pprint(db.translate(db.users[user].my_favorites(n=20), fn=db.get_title))
     print('Your recommending movies:\n', '*'*40)
     pprint(db.translate(rec, fn=db.get_title)) # TODO: Add decorator for translate?
-    assert True
+    assert False
 
     #assert False
 # def test_number_of_entries():
