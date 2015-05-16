@@ -2,6 +2,8 @@ import csv
 import math
 import pprint
 
+class DBError:
+    pass
 
 class User():
     def __init__(self, user_id='1', age='24', gender='M', job='technician', zipcode='85711'):
@@ -114,7 +116,7 @@ class DataBase():
 
         self.users = my_users
         self.movies = my_movies
-        self.similarities = {}
+        self.similarities = None
         #self.ratings = {}
 
     def top_n(self, n=20, min_n=2, user=None):
@@ -183,6 +185,8 @@ class DataBase():
         #     print(user)
         pairings =  calculate_pairings()
 
+        self.similarities = {}
+
         for pairing in pairings:
             # There must be a better way to do this
             pair = set(pairing)
@@ -192,6 +196,19 @@ class DataBase():
 
         return True
 
+    def similar(self, me, other, n=5, min_matches=3):
+        rankings = {}
+        if self.similarities is None:
+            assert DBError('The similarity scores have not been calculated yet for this database')
+        else:
+            for similarity in self.similarities:
+                if me in similarity:
+                    not_me = str(list(filter(me.__ne__, similarity))[0])
+                    rankings[not_me] = self.similarities[similarity]
+        rankings = {user: rankings[user]['dist'] for user in rankings
+                    if rankings[user]['num_shared'] >= n }
+        rankings = sorted(rankings.items(), key=lambda x: x[1], reverse=True)[:n]
+        return rankings
 
 if __name__ == '__main__':
     db = DataBase(users_file='datasets/ml-100k/uhead.user',

@@ -133,7 +133,7 @@ def test_euclidean_distance():
     db = load_files()
     dist = db.euclidean_distance('1', '2')
     print(dist)
-    assert dist - 0.1613 < 0.01
+    assert dist['dist'] - 0.1613 < 0.01
 
 def test_num_items_test_files():
     db = load_files()
@@ -147,7 +147,18 @@ def test_calculate_similarities():
     #print(pairings, '\n Length: ', len(pairings))
     db.calculate_similarities()
     pprint(db.similarities)
-    assert False
+    try:
+        assert db.similarities[('9','8')]['dist'] - 0.1907 < 0.01
+        assert db.similarities[('9','8')]['num_shared'] == 4
+    except:
+        assert db.similarities[('8','9')]['dist'] - 0.1907 < 0.01
+        assert db.similarities[('8','9')]['num_shared'] == 4
+    
+def test_similar_users():
+    db = load_files()
+    db.calculate_similarities()
+    pprint(db.similar('2','1', n=5, min_matches=3))
+    #assert False
 # def test_number_of_entries():
 #     # Data from u.info
 #     db = load_files()
