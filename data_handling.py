@@ -6,7 +6,7 @@ def get_movie_data(data_path):
     	reader = csv.reader(file, delimiter = "|")
     	for row in reader:
     		the_data.append(row)
-    movie_data = {int(row[0]):Movie(row[1]) for row in the_data}
+    movie_data = {int(row[0]):Movie(row[1],row[5:]) for row in the_data}
     return movie_data
 
 def get_user_data(data_path):
@@ -16,6 +16,14 @@ def get_user_data(data_path):
     	for row in reader:
     		user_data.append(row)
     return user_data
+
+def get_user_info(data_path):
+    user_info = {}
+    with open(data_path) as file:
+    	reader = csv.reader(file, delimiter = "|")
+    	for row in reader:
+    		user_info[int(row[0])] = int(row[1])
+    return user_info
 
 def get_user_mov_rating(user_data):
     user_mov_rat = {}
@@ -45,8 +53,13 @@ def get_movie_ratings(user_data):
     return mov_ratings
 
 class Movie:
-    def __init__(self,title):
+    def __init__(self,title,genres):
         self.title = title
+        self.genre_list = genres
+        self.genres = self.find_genres()
+
+    def find_genres(self):
+        return [i for i in range(19) if self.genre_list[i] == '1']
 
     def __repr__(self):
         return self.title
