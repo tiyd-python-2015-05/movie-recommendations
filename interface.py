@@ -15,9 +15,19 @@ def startup():
     movie_names_dict = clean_item_to_movie_dict(item_list, num_of_movies)
     m_list = make_movie_object_list(num_of_movies, \
                                         movie_id_dict, movie_names_dict)
+    u_list = make_user_object_list(num_of_users, user_id_dict)
     return m_list
 
 def make_movie_object_list(num_of_movies, movie_id_dict, movie_names_dict):
+    """This creates a list of movie objects.
+       Each movie includes a movie_title, movie_rating, and average_rating.
+
+       Functional Argument: (num_of_movies, movie_id_dict, movie_names_dict)
+
+           num_of_movies is set to 1682
+           movie_id_dict is dict of moive_id: [[user_id, rating], [...], ]
+           movie_names_dict is dict of movie_id: movie_title"""
+
     movies_object_list = []
     for i in range(num_of_movies):
         movies = Movie(i+1)
@@ -27,6 +37,14 @@ def make_movie_object_list(num_of_movies, movie_id_dict, movie_names_dict):
     return movies_object_list
 
 def make_user_object_list(num_of_users, user_id_dict):
+    """Creates a list of user objects. Each user includes a
+       user_id, user_rating and average_rating
+
+       Functional Arguments: (num_of_users, user_id_dict)
+
+           num_of_users is set to 943
+           user_id_dict is dict user_id: [[movie_id, rating], [...], ]"""
+
     user_object_list = []
     for i in range(num_of_users):
         users = User(i+1)
@@ -35,6 +53,15 @@ def make_user_object_list(num_of_users, user_id_dict):
     return user_object_list
 
 def movie_sorted_list(m_list, rating_filter=5, length_list=20):
+    """Sorts the list of movie objects by the average rating.
+       Only movies with 5 or more ratings are included.
+
+    Functional Arguments: (m_list, rating_filter=5, length_list=20)
+
+        m_list = movie objects list
+        rating_filter is set to 5
+        length_list is set to 20"""
+
     sort_list = []
     for i in m_list:
         if len(i.movie_rating) >= rating_filter:
