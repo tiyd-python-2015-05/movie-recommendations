@@ -44,6 +44,7 @@ def test_make_user_ratings():
     m = User(3)
     m.make_ratings(ratings_dict_by_user)
     assert m.rating_list == [[654, 3], [543, 4]]
+    assert m.user_sim_dict == {}
 
 
 def test_make_user_average_rating():
@@ -148,3 +149,20 @@ def test_calculate_similarity_exception():
 
 def test_calculate_similarity_empty_vector():
     assert calculate_similarity(v1, v8) == 0
+    assert 0 <= calculate_similarity(v6, v7) <= 1
+    assert 0 <= calculate_similarity(v4, v5) == .137
+
+ratings_dict_by_user3 =  {3: [[654, 3], [543, 4], [333, 5], [334, 4], [555, 5]],
+                        4: [[545, 4], [234, 4], [333, 5], [654, 5], [334, 5], [555, 5]]}
+
+def test_create_user_sim_scores():
+    t = User(3)
+    u = User(4)
+    t.make_ratings(ratings_dict_by_user3)
+    u.make_ratings(ratings_dict_by_user3)
+    t.make_ratings_dict()
+    u.make_ratings_dict()
+    t.movies_reviewed()
+    u.movies_reviewed()
+    assert t.create_similarity_score(u) == .309
+    assert t.user_sim_dict[4] == .309

@@ -1,3 +1,5 @@
+from math import sqrt
+
 class ShapeException(Exception):
     pass
 
@@ -7,8 +9,11 @@ def calculate_similarity(vector1, vector2):
     elif len(vector1) == 0:
         return 0
     else:
-        similarity = 1
-        return similarity
+        differences = [vector1[i] - vector2[i] for i in range(len(vector1))]
+        squares = [diff ** 2 for diff in differences]
+        sum_of_squares = sum(squares)
+        return round(1 / (1 + sqrt(sum_of_squares)), 3)
+
 
 
 
@@ -52,6 +57,7 @@ class User:
 
     def make_ratings(self, user_rating_dict):
         self.rating_list = user_rating_dict[self.user_id]
+        self.user_sim_dict = {}
 
 
     def make_ratings_dict(self):
@@ -101,6 +107,13 @@ class User:
             vector_self.append(self.ratings_dict[i])
             vector_other.append(other.ratings_dict[i])
         return vector_self, vector_other
+
+    def create_similarity_score(self, other):
+        (v_self, v_other) = self.make_ratings_vectors(other)
+        similarity = calculate_similarity(v_self, v_other)
+        self.user_sim_dict[other.user_id] = similarity
+        return similarity
+        #need to return??
 
 
 
