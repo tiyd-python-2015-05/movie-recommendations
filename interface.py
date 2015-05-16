@@ -36,6 +36,8 @@ def make_user_objects_list(number_users, user_rev_dict):
         new_user = User(i + 1)
         new_user.make_ratings(user_rev_dict)
         new_user.make_average_rating()
+        new_user.make_ratings_dict()
+        new_user.movies_reviewed()
         user_object_list.append(new_user)
     return user_object_list
 
@@ -57,6 +59,9 @@ def display_top_movies(movie_list, length_list=2, min_reviews=1):
     for i in top:
         print("Movie: {} Average: {}".format(i.movie_title, i.average_rating))
 
+def display_top_movies_not_reviewed(movie_list,user_id, len_list=2, min_rev=1):
+    pass
+##
 
 if __name__ == "__main__":
     m_list, u_list = startup()
