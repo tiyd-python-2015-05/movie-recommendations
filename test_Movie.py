@@ -143,8 +143,7 @@ def test_movies_not_seen():
     t = User(2)
     t.user_rating_dict = {15: 1, 16: 2, 17: 3, 18: 4, 19: 5, 20: 1}
     u.not_in_common_movies = [15, 16, 17, 18, 20]
-    u.movies_not_seen(t)
-    assert u.uncommon_dict == {15: 1, 16: 2, 17: 3, 18: 4, 20: 1}
+    assert u.movies_not_seen(t) == {15: 1, 16: 2, 17: 3, 18: 4, 20: 1}
 
     #{18: 4, 17: 3, 16: 2, 15: 1}
 
