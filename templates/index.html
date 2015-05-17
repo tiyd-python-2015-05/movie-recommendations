@@ -31,7 +31,7 @@
     </table>
   {% endif %}
 
-  <h2>Users</h2>
+  <h2>All Users</h2>
   <table class="sortable">
     <tr>
       <td><h4>User ID</h4></td>
@@ -50,6 +50,29 @@
       </tr>
     {% endfor %}
     </table>
+
+    <h3>All Movies: </h3>
+    <table class="sortable">
+      <tr>
+        <td><h4>Title</h4></td>
+        <td><h4>Average Rating</h4></td>
+        <td><h4>Number of Ratings</h4></td>
+        <td><h4>IMDb Link</h4></td>
+        <td><h4>Release Date</h4></td>
+
+
+      {% for movie in db.movies %}
+        <tr>
+          <td><a href="{{ url_for('show_movie', movie=movie) }}">{{ db.movies[movie].movie_title }} </a></td>
+          <td>{{ db.movies[movie].avg_rating }}</td>
+          <td>{{ db.movies[movie].num_ratings }}</td>
+          <td><a href="{{ db.movies[movie].IMDb_URL }}">IMDb Link</a></td>
+          <td>{{ db.movies[movie].release_date }}</td>
+        </tr>
+      {% endfor %}
+      </tr>
+    </table>
+
 {% else %}
   <h1>Database not found</h1>
 {% endif %}

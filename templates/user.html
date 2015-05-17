@@ -116,13 +116,6 @@
     </table>
 
 
-  {#
-    <h3>All Users:</h3>
-    {% for user in users %}
-      <a href="{{ url_for('show_user_profile', user=user) }}">{{ user }}</a>
-    {% endfor %}
-  #}
-
   {% else %}
     <h1>User not found</h1>
   {% endif %}
