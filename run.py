@@ -8,9 +8,9 @@ import os
 
 class Run:
     def __init__(self):
-        a, b = load()
-        self.frame = Frame(a, b)
-        self.driver = Driver(self.frame)
+        a, b, c = load()
+        self.frame = Frame(a, b, c)
+
         self.commands = {'u': 'Print 5 random users', 'q': 'Quit Program',
                          'a': 'Find movie by ID',
                          'b': 'Average rating by movie ID',
@@ -49,7 +49,7 @@ class Run:
             if inp.lower()[0] == 't':
                 os.system('clear')
                 print("Top 5 movies: ")
-                print(self.frame.top_movies())
+                print(self.top_5())
 
             if inp.lower()[0] == 's':
                 os.system('clear')
@@ -67,11 +67,14 @@ class Run:
                 os.system('clear')
                 print(self.movies())
 
+    def top_5(self):
+        return self.frame.top_movies()
+
     def movies(self):
         return [random.choice(list(self.frame.names.keys())) for _ in range(5)]
 
     def print_users(self):
-        print([random.choice(self.frame.users) for _ in range(5)])
+        print([random.choice(list(self.frame.users.keys())) for _ in range(5)])
 
     def movies_id(self, mid):
         return self.frame.name_by_id(mid)
@@ -86,14 +89,15 @@ class Run:
             dist = input("By what metric? (E)uclidean, (P)earson: ").lower()[0]
 
         if dist == 'e':
-            dist = self.driver.e_distance
+            dist = self.frame.e_distance
         else:
-            dist = self.driver.p_distance
+            dist = self.frame.p_distance
 
         if uid.isdigit():
             os.system('clear')
             print("Closest users to user {}:".format(uid))
-            print(self.driver.find_closest(int(uid), dist)[0])
+            for item in self.frame.find_closest(int(uid), dist):
+                print(item[0])
         else:
             print("No user with that ID found")
 
@@ -105,14 +109,14 @@ class Run:
                              (P)earson: ").lower()[0]
 
         if distance == 'e':
-            distance = self.driver.e_distance
+            distance = self.frame.e_distance
         else:
-            distance = self.driver.p_distance
+            distance = self.frame.p_distance
 
         if uid.isdigit():
             os.system('clear')
             print("Movie Recommendations for user {}:".format(uid))
-            movies = self.driver.find_rec_user(int(uid), distance)
+            movies = self.frame.find_rec_user(int(uid), distance)
             for movie in movies:
                 print("{}".format(movie))
         else:
@@ -126,14 +130,14 @@ class Run:
                              (P)earson: ").lower()[0]
 
         if distance == 'e':
-            distance = self.driver.movie_e_distance
+            distance = self.frame.movie_e_distance
         else:
-            distance = self.driver.movie_p_distance
+            distance = self.frame.movie_p_distance
 
         if mid.isdigit():
             os.system('clear')
             print("Movie Recommendations from movie {}:".format(mid))
-            movies = self.driver.find_closest_movies(int(mid), distance)
+            movies = self.frame.find_closest_movies(int(mid), distance)
             for movie in movies:
                 print("{}".format(movie))
         else:
