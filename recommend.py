@@ -237,9 +237,12 @@ class DataBase():
         """Returns passed list of 2-tuples with item[0] transformed with fn"""
         return [(fn(item[0]), item[1]) for item in data]
 
-    def recommend(self, user_id, n=5, mode='simple', num_users=1):
+    def recommend(self, user_id, n=5, mode='simple', num_users=1, min_matches=3):
+        if mode == 'dumb':
+            return self.top_n(n=n, min_n=min_matches, user=user_id)
+
         if self.users[user_id].similar == None:
-            self.similar(user_id, n=5, min_matches=3)
+            self.similar(user_id, n=5, min_matches=min_matches)
         if mode=='simple': # Return top n rated movies from most similar user
             top_matching_users = self.users[user_id].similar[:num_users]
             top_movies = []

@@ -5,9 +5,9 @@ app = Flask(__name__)
 
 
 
-db = r.DataBase(users_file='datasets/ml-100k/uhead.user',
+db = r.DataBase(users_file='datasets/ml-100k/u.user',
               movies_file='datasets/ml-100k/u.item',
-              ratings_file='datasets/ml-100k/uhead.data')
+              ratings_file='datasets/ml-100k/u.data')
 db.calculate_similarities()
 users = sorted([i for i in db.users], key=int)
 
@@ -30,6 +30,7 @@ def index():
 def show_user_profile(user):    # db=db):
     # show the user profile for that user
     db.users[user].sort_ratings()
+    pop = db.recommend(user, n=20, mode='dumb', num_users=5)
     rec = db.recommend(user, n=20, mode='simple', num_users=5)
     # print('Your favorite movies:\n', '*'*40)
     favs = db.users[user].my_favorites(n=500) #db.translate(db.users[user].my_favorites(n=500), fn=db.get_title)
@@ -37,7 +38,7 @@ def show_user_profile(user):    # db=db):
     recs = rec #recs = db.translate(rec, fn=db.get_title) # TODO: Add decorator for translate?
     sim =  db.similar(user, n=10, min_matches=3)
 
-    return render_template('user.html', user=user, db=db, favs=favs, recs=recs, users=users, sim=sim)
+    return render_template('user.html', user=user, db=db, favs=favs, pop=pop, recs=recs, users=users, sim=sim)
 
 @app.route('/movie/<movie>')
 def show_movie(movie):    # db=db):
