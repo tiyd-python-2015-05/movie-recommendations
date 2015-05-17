@@ -54,10 +54,12 @@
     <tr>
       <td><h4>Title</h4></td>
       <td><h4>Suggestion Score</h4></td>
+      <td><h4>Title</h4></td>
 
     {% for movie in recs %}
       <tr>
-        <td>{{ movie[0] }}</td>
+        <td><a href="{{ url_for('show_movie', movie=movie[0]) }}">{{ db.movies[movie[0]].movie_title }} </a></td>    
+        <td> </td>
         <td>{{ movie[1] }}</td>
       </tr>
     {% endfor %}

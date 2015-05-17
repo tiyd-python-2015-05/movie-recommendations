@@ -33,10 +33,16 @@ def show_user_profile(user):    # db=db):
     print('Your favorite movies:\n', '*'*40)
     favs = db.translate(db.users[user].my_favorites(n=500), fn=db.get_title)
     print('Your recommending movies:\n', '*'*40)
-    recs = db.translate(rec, fn=db.get_title) # TODO: Add decorator for translate?
+    recs = rec #recs = db.translate(rec, fn=db.get_title) # TODO: Add decorator for translate?
     sim =  db.similar(user, n=10, min_matches=3)
 
     return render_template('user.html', user=user, db=db, favs=favs, recs=recs, users=users, sim=sim)
+
+@app.route('/movie/<movie>')
+def show_movie(movie):    # db=db):
+    # show the user profile for that user
+
+    return render_template('movie.html', db=db, movie=movie)
 
 # @app.route('/post/<int:post_id>')
 # def show_post(post_id):

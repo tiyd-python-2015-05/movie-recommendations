@@ -69,7 +69,7 @@ class User():
 class Movie():
     item_fieldnames = \
         ['movie_id', 'movie_title', 'release_date', 'video_release_date',
-        'IMDb URL', 'unknown', 'Action', 'Adventure', 'Animation',
+        'IMDb_URL', 'unknown', 'Action', 'Adventure', 'Animation',
         "Childrens", 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy',
         'FilmNoir', 'Horror', 'Musical', 'Mystery', 'Romance', 'SciFi',
         'Thriller', 'War', 'Western']
