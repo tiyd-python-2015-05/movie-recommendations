@@ -32,7 +32,7 @@ def show_user_profile(user):    # db=db):
     db.users[user].sort_ratings()
     rec = db.recommend(user, n=20, mode='simple', num_users=5)
     # print('Your favorite movies:\n', '*'*40)
-    favs = db.translate(db.users[user].my_favorites(n=500), fn=db.get_title)
+    favs = db.users[user].my_favorites(n=500) #db.translate(db.users[user].my_favorites(n=500), fn=db.get_title)
     # print('Your recommended movies:\n', '*'*40)
     recs = rec #recs = db.translate(rec, fn=db.get_title) # TODO: Add decorator for translate?
     sim =  db.similar(user, n=10, min_matches=3)
