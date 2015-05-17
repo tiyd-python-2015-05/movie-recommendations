@@ -180,8 +180,8 @@ def test_make_top_list_movies_not_seen():
     m = User(1)
     m.movies_list = [22]
     n = User(2)
-    n.movies_list = [[2, 4, 6, 8, 10, 12, 14, 16, 18, 20]]
+    n.movies_list = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
     n.ratings_dict = {2: 1, 4: 2, 6: 3, 8: 4, 10: 5, 12: 1, 14: 2, 16: 3,
                       18: 4, 20: 5}
-    assert m.movies_reviewed_not_seen(n) == [(10, 5), (20, 5), (18, 4), (8, 4),
-                                              (15, 3)]
+    assert m.movies_reviewed_not_seen(n) == [(20, 5), (10, 5), (8, 4), (18, 4),
+                                              (16, 3)]
