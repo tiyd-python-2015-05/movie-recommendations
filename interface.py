@@ -3,10 +3,10 @@ from classes import *
 from operator import attrgetter, itemgetter
 from numbers import Number
 
-#sorted(list_name, key=attrgetter(<attribute>)) "string that is the attribute"
-#sort stability
 
 def startup():
+    """Gets data from u.data and u.list and stores user and movie objects in
+    two separate lists."""
     users = 943
     movies = 1682
     data_file = 'u.data'
@@ -20,7 +20,9 @@ def startup():
     u_list = make_user_objects_list(users, user_rev_dict)
     return m_list, u_list
 
+
 def make_movie_objects_list(number_movies, movie_names_dict, movie_rev_dict):
+    """Makes movie objects list for startup."""
     movie_object_list = []
     for i in range(number_movies):
         new_movie = Movie(i + 1)
@@ -32,6 +34,7 @@ def make_movie_objects_list(number_movies, movie_names_dict, movie_rev_dict):
 
 
 def make_user_objects_list(number_users, user_rev_dict):
+    """Makes user object list for startup."""
     user_object_list = []
     for i in range(number_users):
         new_user = User(i + 1)
@@ -44,18 +47,20 @@ def make_user_objects_list(number_users, user_rev_dict):
 
 
 def top_movies(movie_list, length_list=2, min_reviews=1):
+    """Makes top movie list for initial display with min number
+    of reviews filter."""
     sort_list = []
     for movie in movie_list:
        if len(movie.movie_rating) >= min_reviews:
            sort_list.append(movie)
     sort_list = sorted(sort_list, key=attrgetter('average_rating'), \
                reverse=True)
-#   double_sort_list = sorted(sort_list, key=attrgetter('movie_title'))
     top = sort_list[0:length_list]
     return top
 
 
 def display_top_movies(movie_list, length_list=2, min_reviews=1):
+    """Displays top movie list in interface."""
     top = top_movies(movie_list, length_list, min_reviews)
     print("Welcome to the Movie Rating Database.")
     print("Our current top movies are:")
@@ -80,25 +85,33 @@ def find_top_movies_not_rated(movie_list, user_list, user_id, \
 
 
 def display_top_user_movies(movie_list, user_list, user_id, length_list=2, min_rev=1):
+    """Displays the top movies user hasn't seen in interface."""
     top = find_top_movies_not_rated(movie_list, user_list, user_id, \
                                     length_list, min_rev)
+    print("The top rated movies you have not seen are: ")
     for i in top:
         print("Movie: {} Average: {}".format(i.movie_title, i.average_rating))
 
+
 def choose_user():
-    user_id = int(input("What is your user id?:" ))
-    if user_id <= 1 or user_id >=944:
+    """Asks user for id to access user info."""
+    try:
+        user_id = int(input("What is your User ID?: "))
+        if user_id not in range(1,944):
+            return choose_user()
+        else:
+            return (user_id)
+    except ValueError:
+        print("Numbers only!!")
         return choose_user()
-    else:
-        return user_id
+
 
 def display_user(user_id, u_list):
+    """Displays user info after login."""
     print("Welcome User {}".format(user_id))
     u = u_list[(user_id-1)]
     print("You have reviewed {} movies.".format(len(u.rating_list)))
     print("Your average review score is {}".format(u.average_rating))
-
-
 
 
 def make_user_similarities(user_object):
@@ -110,69 +123,90 @@ def make_user_similarities(user_object):
     top_similar_users = user_object.create_top_users_in_common()
     return top_similar_users
 
+
 def user_options():
+    """Displays user options after login."""
     print("What would you like to do?")
     print("1. See the top rated movies you haven't seen.")
     print("2. See a list of similar users with recommendations.")
-    print("3. Quit")
-    user_input= int(input("Choose 1, 2, or 3: "))
-    if user_input > 3 or user_input < 1:
+    user_input= int(input("Choose 1 or 2: "))
+    if user_input > 2 or user_input < 1:
         return user_option()
     else:
         return user_input
 
 
+def display_sim_user_recs(similar_users, u_list):
+    """Displays recommendations from most similar users in interface."""
+    similar_user_list = [i[0] for i in similar_users]
+    sim_user1 = u_list[(similar_user_list[0]-1)]
+    sim_user2 = u_list[(similar_user_list[1]-1)]
+    sim_user3 = u_list[(similar_user_list[2]-1)]
+    top_rec_sim_user1 = u.movies_reviewed_not_seen(sim_user1)
+    top_rec_sim_user2 = u.movies_reviewed_not_seen(sim_user2)
+    top_rec_sim_user3 = u.movies_reviewed_not_seen(sim_user3)
+    print("For User {}, your top recommmendations are: ".format(sim_user1.user_id))
+    for i in top_rec_sim_user1:
+        movie_id = i[0]
+        rating = i[1]
+        movie = m_list[(movie_id) - 1]
+        print("{}, Rated {}".format(movie.movie_title, rating))
+    print("For User {}, your top recommmendations are: ".format(sim_user2.user_id))
+    for i in top_rec_sim_user2:
+        movie_id = i[0]
+        rating = i[1]
+        movie = m_list[movie_id - 1]
+        print("{}, Rated {}".format(movie.movie_title, rating))
+    print("For User {}, your top recommmendations are: ".format(sim_user3.user_id))
+    for i in top_rec_sim_user3:
+        movie_id = i[0]
+        rating = i[1]
+        movie = m_list[movie_id - 1]
+        print("{}, Rated {}".format(movie.movie_title, rating))
+
+
+def user_quit():
+    quit = (input("Would you like to quit? (Y/n): ")).lower()
+    if quit == "n":
+        return False
+    else:
+        return True
+
+
+# def user_interface():
+#     while True:
+#         m_list, u_list = startup()
+#         display_top_movies(m_list, 20, 5)
+#         user_id = choose_user()
+#         u = u_list[(user_id - 1)]
+#         u.movies_reviewed()
+#         display_user(user_id, u_list)
+#         user_choice = user_options()
+#         if user_choice == 1:
+#             display_top_user_movies(m_list, u_list, user_id,
+#                                     length_list=5, min_rev=5)
+#         if user_choice == 2:
+#             similar_users = make_user_similarities(u)
+#             display_sim_user_recs(similar_users, u_list)
+#         if user_quit():
+#             break
+
 
 if __name__ == "__main__":
+#    user_interface()
     while True:
         m_list, u_list = startup()
-        display_top_movies(m_list, 20, 5)
+        display_top_movies(m_list, 10, 5)
         user_id = choose_user()
         u = u_list[(user_id - 1)]
-
         u.movies_reviewed()
-        print(str(u))
         display_user(user_id, u_list)
         user_choice = user_options()
-        print("The top rated movies you have not seen are: ")
-        display_top_user_movies(m_list, u_list, user_id, length_list=5, min_rev=5)
-        similar_users = make_user_similarities(u)
-        similar_user_list = [i[0] for i in similar_users]
-        sim_user1 = u_list[(similar_user_list[0]-1)]
-        sim_user2 = u_list[(similar_user_list[1]-1)]
-        sim_user3 = u_list[(similar_user_list[2]-1)]
-        top_rec_sim_user1 = u.movies_reviewed_not_seen(sim_user1)
-        top_rec_sim_user2 = u.movies_reviewed_not_seen(sim_user2)
-        top_rec_sim_user3 = u.movies_reviewed_not_seen(sim_user3)
-        print("Your Top 3 Similar Users are: ")
-        for i in similar_users:
-            print("User {}, Similarity Score {}".format(i[0], i[1]))
-        print("For User {}, your top recommmendations are: ".format(sim_user1.user_id))
-#        print(top_rec_sim_user1)
-        for i in top_rec_sim_user1:
-            movie_id = i[0]
-            rating = i[1]
-            movie = m_list[(movie_id) - 1]
-            print("{}, Rated {}".format(movie.movie_title, rating))
-        print("For User {}, your top recommmendations are: ".format(sim_user2.user_id))
-        for i in top_rec_sim_user2:
-            movie_id = i[0]
-            rating = i[1]
-            movie = m_list[movie_id - 1]
-            print("{}, Rated {}".format(movie.movie_title, rating))
-        print("For User {}, your top recommmendations are: ".format(sim_user3.user_id))
-        for i in top_rec_sim_user3:
-            movie_id = i[0]
-            rating = i[1]
-            movie = m_list[movie_id - 1]
-            print("{}, Rated {}".format(movie.movie_title, rating))
-
-
-
-
-
-
-
-#    for i in top_movies:
-#        print("Movie: {} Average: {}".format(i.movie_title, i.average_rating))
-###make functions for displaying movie id info in the interface
+        if user_choice == 1:
+            display_top_user_movies(m_list, u_list, user_id,
+                                    length_list=20, min_rev=5)
+        if user_choice == 2:
+            similar_users = make_user_similarities(u)
+            display_sim_user_recs(similar_users, u_list)
+        if user_quit():
+            break
