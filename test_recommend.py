@@ -124,7 +124,7 @@ def test_top_n_user():
     tup_list = db.users['1'].movies
     m_list = [m[0] for m in tup_list]
     #print(m_list)
-    filtered = db.top_n(n=20, min_n=4, user='1')
+    filtered = db.top_n(n=20, min_n=5, user='1')
     assert len(unfiltered) > len(filtered)
     for (mov, avg) in filtered:
         assert mov not in db.users['1'].movies
@@ -260,6 +260,7 @@ def test_full_data_set():
     print(time.time() - start)
     assert False
 
+#TODO: Add test that users[user_id].user_id == user_id
 
     #assert False
 # def test_number_of_entries():
