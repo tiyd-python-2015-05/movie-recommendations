@@ -123,6 +123,18 @@ class Movie():
     def avg_rating(self):
         return sum([int(val) for val in self.ratings.values()]) / len(self.ratings)
 
+    @property
+    def genres(self):
+        all_genres = ['unknown', 'Action', 'Adventure', 'Animation',
+        "Childrens", 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy',
+        'FilmNoir', 'Horror', 'Musical', 'Mystery', 'Romance', 'SciFi',
+        'Thriller', 'War', 'Western']
+
+        my_genres = []
+        for g in all_genres:
+            if getattr(self, g, 0) == '1':
+                my_genres.append(g)
+        return my_genres
 
 class DataBase():
     def __init__(self, users_file, movies_file, ratings_file):

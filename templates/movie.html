@@ -14,12 +14,14 @@
         <td><h4>IMDb Link</h4></td>
         <td><h4>Release Date</h4></td>
         <td><h4>Video Release Date</h4></td>
+        <td><h4>Genres</h4></td>
       </tr>
       <tr>
         <td><a href="{{ url_for('show_movie', movie=movie) }}">{{ db.movies[movie].movie_title }} </a></td>
         <td><a href="{{ db.movies[movie].IMDb_URL}}">IMDb Link (external)</a></td>
         <td>{{ db.movies[movie].release_date }}</td>
         <td>{{ db.movies[movie].video_release_date }}</td>
+        <td>{{ ', '.join(db.movies[movie].genres) }}</td>
       </tr>
     </table>
 

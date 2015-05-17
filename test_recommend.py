@@ -235,6 +235,7 @@ def test_sanity_check():
     pprint(db.translate(rec, fn=db.get_title)) # TODO: Add decorator for translate?
     assert True
 
+"""
 def test_full_data_set():
     # elapsed time for each function as of 5/16/2015:
     # load_files: 0.9330952167510986
@@ -259,7 +260,11 @@ def test_full_data_set():
     pprint(db.translate(rec, fn=db.get_title)) # TODO: Add decorator for translate?
     print(time.time() - start)
     assert False
+"""
 
+def test_genres():
+    db = load_files(movies_file='datasets/ml-100k/u.item')
+    assert db.movies['100'].genres == ['Crime', 'Drama', 'Thriller']
 #TODO: Add test that users[user_id].user_id == user_id
 
     #assert False

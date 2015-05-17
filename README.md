@@ -7,4 +7,5 @@
 2. Run on the command line: "python3 ui.py"*
 3. Open http://127.0.0.1:5000/ in a web browser window
 4. Explore the site to find ratings for movies, movie rankings, and recommendations for each user based on their previous ratings
+
 ######* Note: This application is under development, and uses debug mode and as such, should not be used in a production environment!
