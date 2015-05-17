@@ -1,3 +1,11 @@
+To run the movie recommendation database, open Terminal and type:
+python3 interface.py
+
+You can enter a user ID between 1 and 943 to access personalized suggestions.
+
+CTRL - C will exit if you have any problems.
+
+Enjoy!
 # Movie Recommendations
 
 ## Description
