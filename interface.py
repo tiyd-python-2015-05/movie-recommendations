@@ -95,17 +95,13 @@ def user_choice():
     elif user_choice == '3':
         user_id = int(input("Please enter your user ID#:\n> "))
 
-
+        sim_users = display_sim_users(u_list, user_id)
         print("Your top three similar users:")
         for i in range(3):
             print("User_ID: {}, Similarity Score: {}"\
-                  .format(top_user_ids[i][0], top_user_ids[i][1]))
+                  .format(sim_users[i][0], sim_users[i][1]))
         print("\n")
 
-        # top_movies = display_movie_recs_other_user(u_list, m_list, user_id, user_id_dict)
-        # print("The top movies are:")
-        # for i in top_movies:
-        #     print("{}".format(i))
 
     elif user_choice == 'e' or user_choice == 'E':
         return exit()
@@ -148,56 +144,30 @@ def display_sim_users(u_list, user_id):
             user.create_similarity(i)
     top_sim_users = user.top_similar_users()
     return top_sim_users[1:4]
-    
-    # similar_user_list = [i[0] for i in similar_users]
-    # sim_user1 = u_list[(similar_user_list[0]-1)]
-    # sim_user2 = u_list[(similar_user_list[1]-1)]
-    # sim_user3 = u_list[(similar_user_list[2]-1)]
-    # top_3_sim_users =
-    # return top_3_sim_users
-#def display_sim_user_recs(similar_users, u_list, user_id):
+
+def similar_users(u_list, user_id):
+    sim_users = display_sim_users(u_list, user_id)
+    sim_user1 = u_list[(sim_users[0][0] - 1)]
+    sim_user2 = u_list[(sim_users[1][0] - 1)]
+    sim_user3 = u_list[(sim_users[2][0] -1)]
+    return [sim_user1, sim_user2, sim_user3]
+
+def display_sim_user_recs(u_list, user_id):
     user = u_list[user_id-1]
     user.rating_list(user_id_dict)
     user.rating_dict(user_id_dict)
     user.movies_reviewed()
-#     user = u_list[user_id-1]
-#     user.rating_list(user_id_dict)
-#     user.rating_dict(user_id_dict)
-#     user.movies_reviewed()
-#     list_of_vectors = [] #[[vector_self], [vector_other]]
-#     for i in u_list:
-#         if user != i:
-#             i.rating_list(user_id_dict)
-#             i.rating_dict(user_id_dict)
-#             i.movies_reviewed())
+    sim_users = similar_users(u_list, user_id)
+    sim_user1_top5 = user.movies_not_seen(sim_users[0])
+    sim_user2_top5 = user.movies_not_seen(sim_users[1])
+    sim_user3_top5 = user.movies_not_seen(sim_users[2])
+    movie_rec_list = [sim_user1_top5, sim_user2_top5, sim_user3_top5]
 
-            # user.compare_user_reviews(i)
-            # print(user.compare_user_reviews(i))
-            # print(user.make_common_vectors(i))
-    #         print(user.create_similarity(i))
-    # return user.top_similar_users()
-
-# def display_movie_recs_other_user(u_list, m_list, user_id, user_id_dict, sim_users=3):
-#     user = u_list[user_id-1]
-#     user.rating_list(user_id_dict)
-#     user.rating_dict(user_id_dict)
-#     user.movies_reviewed()
-#     top_other_users = display_rec_other_ids(u_list, m_list, user_id)[:sim_users]
-#     #list of tuples [(u_id, sim score), (u, s), (u, s)]
-#     movies_list = []
-#     for i in range(sim_users):
-#         top_other_user = u_list[top_other_users[i][0]-1]
-#         top_other_user.rating_list(user_id_dict)
-#         top_other_user.rating_dict(user_id_dict)
-#         top_other_user.movies_reviewed()
-#         print(top_other_user.user_rating_dict)
-#         # print(user.movies_not_seen(top_other_user))
-#         movies_list_top_other_user = user.top_similar_movies(top_other_user)
-#     return movies_list.append(movies_list_top_other_user)
 
 if __name__=='__main__':
     start = startup()  #[user_id_dict, m_list, u_list]
     user_id_dict = start[0]
     m_list = start[1]
     u_list = start[2]
-    display_sim_users(u_list, 4)
+    user_choice()
+    # print(display_sim_user_recs(u_list, 4))

@@ -143,32 +143,23 @@ class User:
         return self.top_sim_users
         #self.top_sim_users is a list of tups [(other_id, sim score), (o ,sim)]
 
-    def movies_not_seen(self, other):
+    def movies_not_seen(self, other, length=5):
         """Creates self.uncommon_dict which is a dictionary of movies
         and other user ratings. The dictionary is unsorted.
         This function should be passed into top_similar_movies.
         Functional Arguments: (self, other)
         other is self.top_similar_users[0][0]"""
-        uncommon_dict = {} #this used to be self.uncommon_dict
-        for i in self.not_in_common_movies:
-            uncommon_dict.setdefault(i, other.user_rating_dict[i])
-        return uncommon_dict
+        uncommon_list = self.make_uncommon_ratings(other)
+        uncommon_dict = {}
 
-    def top_similar_movies(self, other, length=5):
-        """Returns the top movies based on an other user most similar to self.
+        for i in uncommon_list:
+            uncommon_dict[i] = other.user_rating_dict[i]
 
-        Functional Arguments: (self, other, length=5)
-        other is the user most similar that must be passed into fucntion
-        from top_similar_users[0][0]
-        length is preset to 5, returns the top five movie_ids.
-        """
-        #prints as a list of tuples
-        uncommon_dict = self.movies_not_seen(other)
-        top_uncommon_movies = sorted(uncommon_dicts.items(),\
-                                     key=lambda x: x[1], reverse=True)
-        #calling 0-6 will give key of tuples
-        top_uncommon_movies_ids_list = [top_uncommon_movies[i][0] for i in range(length)]
-        return top_uncommon_movies_ids_list
+        sort_uncommon = sorted(uncommon_dict.items(), key=lambda x:x[1],\
+                        reverse=True)
+
+        top = sort_uncommon[0:length]
+        return top
 
 ################################################################################
 
