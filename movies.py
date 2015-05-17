@@ -165,8 +165,6 @@ def read_movie_file():
             props_dict = {}
             if use_1m:
                 row = fix_row(row)
-#                for i in range(len(row)):
-#                    row[i] = row[i].replace(":", "")
                 movie_id = int(row[0])
                 movie_title = row[1]
                 movie_date = ""
@@ -211,11 +209,6 @@ def read_user_file():
         for row in reader:
             if use_1m:
                 row = fix_row(row)
-#                store = row
-#                row = []
-#                for st in store:
-#                    if len(st)>0:
-#                        row.append(st)
             user_vals = [int(x) for x in row]
             user_id = user_vals[0]
             movie_id = user_vals[1]
@@ -231,43 +224,44 @@ def read_user_file():
     return user_dict
 
 
-def similar_users(u1_id):
-    '''Returns 2 lists about 5 users most common to u1
-        (id value of similar users, correlation coefficient)'''
-    u1 = user_dict[u1_id]
-    similar_ids = [0, 0, 0, 0, 0]
-    similar_sc = [0, 0, 0, 0, 0]
-    for u2_id in user_dict.keys():
-        if u2_id != u1_id:
-            u2 = user_dict[u2_id]
-            u12mid, u1s, u2s = common_movies(u1, u2)
+def common_objects(o1_id, the_dict):
+    '''If movie, returns list about similar movies
+       if user, returns list about similar users
+        (id value of similar ones, correlation coefficient)'''
+    o1 = the_dict[o1_id]
+    similar_ids = [0 for i in range(5)]
+    similar_sc = [0 for i in range(5)]
+    for o2_id in the_dict.keys():
+        if o2_id != o1_id:
+            o2 = the_dict[o2_id]
+            o12mid, o1s, o2s = common_links(o1, o2)
             if use_pearson:
-                score = pearson_product(u1s, u2s)
+                score = pearson_product(o1s, o2s)
             else:
-                score = euclidean_distance(u1s, u2s)
-            if score > min(similar_sc) and len(u1s) > 5:
+                score = euclidean_distance(o1s, o2s)
+            if score > min(similar_sc) and len(o1s) > 5:
                 i = similar_sc.index(min(similar_sc))
-                similar_ids[i] = u2_id
-                similar_sc[i] = score
+                similar_ids[i] = o2_id
+                similar_sc[i]  = score
     return similar_ids, similar_sc
 
 
-def common_movies(user1, user2):
+def common_links(object1, object2):
     '''Returns 3 lists of movies in common between u1 and u2
         lists are (ID, user #1 stars, user #2 stars)'''
     indicies = []
-    u1_stars = []
-    u2_stars = []
-    for m1 in user1.rate_val:
-        for m2 in user2.rate_val:
-            if m1 == m2:
-                indicies.append(m1)
-                u1_stars.append(user1.rate_val[m1])
-                u2_stars.append(user2.rate_val[m2])
-    return indicies, u1_stars, u2_stars
+    o1_stars = []
+    o2_stars = []
+    for op1 in object1.rate_val:
+        for op2 in object2.rate_val:
+            if op1 == op2:
+                indicies.append(op1)
+                o1_stars.append(object1.rate_val[op1])
+                o2_stars.append(object2.rate_val[op2])
+    return indicies, o1_stars, o2_stars
 
 
-def search_for_movie(movie_dict):    
+def search_for_movie(movie_dict):
     print(" ")
     text = input(" type string to search for:  ")
     while True:
@@ -282,6 +276,8 @@ def search_for_movie(movie_dict):
             print(str(i+1)+" "+str(movie_dict[movie_ids[i]]))
         print(" ")
         text = input(" make a selection or type a new search: ")
+        if len(text) == 0:
+            text = " "
         if text[0].isdigit():
             break
     return movie_ids[i-1]
@@ -337,7 +333,7 @@ def compare_random_users(user_dict):
             u2 = user_dict[random.choice(list(user_dict.keys()))]
             if u1 != u2:
                 break
-        u12mid, u1s, u2s = common_movies(u1, u2)
+        u12mid, u1s, u2s = common_links(u1, u2)
 
         print("user1: " + " ".join([str(u1s[i]) for i in range(len(u1s))]))
         print("user2: " + " ".join([str(u2s[i]) for i in range(len(u2s))]))
@@ -346,7 +342,7 @@ def compare_random_users(user_dict):
               str(round(pearson_product(u1s, u2s), 2)).rjust(6))
 
 
-def similarity_suggestions(movie_dict):
+def similarity_suggestions(movie_dict, user_dict):
 
     print(" ")
     print(" Top movies out of your history")
@@ -367,7 +363,7 @@ def similarity_suggestions(movie_dict):
     print(" ")
     print(" Watch reccomendations based off similar users")
     print("                                   Title             Score")
-    group_ids, group_scores = similar_users(current_user_id)
+    group_ids, group_scores = common_objects(current_user_id, user_dict)
 
     for i in range(len(group_ids)):
         u2 = user_dict[group_ids[i]]
@@ -390,6 +386,24 @@ def similarity_suggestions(movie_dict):
         if top_mid[i] != 0:
             print(str(movie_dict[top_mid[i]]).rjust(50) + " " +
                   str(round(top_scores[i], 2)))
+
+def similar_movie_suggest(m_id, movie_dict, user_dict):
+    print(" ")
+    current_movie = movie_dict[m_id]
+    print(" Movies similar to '" + str(current_movie) + "'")
+    print("based on user score correlation")
+    print(" ")
+    ids, scores = common_objects(m_id, movie_dict)
+    for i in range(len(ids)):
+        print(str(i) + " " + str(movie_dict[ids[i]]))
+    print(" ")
+    print(" Pick a movie to switch to, or just hit enter")
+    sel = input("   enter selection: ")
+    if len(sel) > 0:
+        return ids[int(sel)]
+    else:
+        return m_id
+
 
 # Math Functions
 
@@ -475,7 +489,8 @@ if __name__ == '__main__':
         print("  6: print 10 random users")
         print("  7: view suggestions based on similar users")
         print("  8: change the type of similarity distance calc")
-        print("  9: change movie by searching")
+        print("  9: change current movie by searching")
+        print("  0: suggest similar movies to current one")
         print("  e: exit")
         print(" ")
 
@@ -499,7 +514,7 @@ if __name__ == '__main__':
         elif val == "6":
             print_random_10_users(user_dict)
         elif val == "7":
-            similarity_suggestions(movie_dict)
+            similarity_suggestions(movie_dict, user_dict)
         elif val == "8":
             if use_pearson:
                 use_pearson = False
@@ -507,6 +522,10 @@ if __name__ == '__main__':
                 use_pearson = True
         elif val == "9":
             current_movie_id = search_for_movie(movie_dict)
+            current_movie = movie_dict[current_movie_id]
+        elif val == "0":
+            current_movie_id = similar_movie_suggest(
+                current_movie_id, movie_dict, user_dict)
             current_movie = movie_dict[current_movie_id]
         elif val == "e":
             break
