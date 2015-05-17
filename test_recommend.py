@@ -1,5 +1,6 @@
 from recommend import *
 from pprint import pprint as pprint
+import time
 
 def test_data_files_are_present():
     with open("datasets/ml-100k/u.data") as file:
@@ -76,15 +77,17 @@ def test_movies_avg_rating():
     movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
     assert movies['7'].avg_rating == 3.6
 
-def load_files(movies_file='datasets/ml-100k/uhead.item'):
+def load_files(users_file='datasets/ml-100k/uhead.user',
+               movies_file='datasets/ml-100k/uhead.item',
+               ratings_file='datasets/ml-100k/uhead.data'):
 #     users = User.load_users('datasets/ml-100k/uhead.user')
 #     users = User.load_ratings('datasets/ml-100k/uhead.data', users)
 #     movies = Movie.load_movies('datasets/ml-100k/uhead.item')
 #     movies = Movie.load_ratings('datasets/ml-100k/uhead.data', movies)
 #     return users, movies
-    db = DataBase(users_file='datasets/ml-100k/uhead.user',
+    db = DataBase(users_file=users_file,
                   movies_file=movies_file,
-                  ratings_file='datasets/ml-100k/uhead.data')
+                  ratings_file=ratings_file)
     return db
 
 def test_db_creation():
@@ -230,7 +233,33 @@ def test_sanity_check():
     pprint(db.translate(db.users[user].my_favorites(n=20), fn=db.get_title))
     print('Your recommending movies:\n', '*'*40)
     pprint(db.translate(rec, fn=db.get_title)) # TODO: Add decorator for translate?
+    assert True
+
+def test_full_data_set():
+    # elapsed time for each function as of 5/16/2015:
+    # load_files: 0.9330952167510986
+    # calculate_similarities: 38.40591812133789
+    # sort_ratings: 38.406957149505615
+    # db.recommend: 38.493452072143555
+    start = time.time()
+    db = load_files(users_file='datasets/ml-100k/u.user',
+                    movies_file='datasets/ml-100k/u.item',
+                    ratings_file='datasets/ml-100k/u.data')
+    print('load_files:', time.time() - start)
+    db.calculate_similarities()
+    print('calculate_similarities:', time.time() - start)
+    user = '1'
+    db.users[user].sort_ratings()
+    print('sort_ratings:', time.time() - start)
+    rec = db.recommend(user, n=20, mode='simple', num_users=5)
+    print('db.recommend:', time.time() - start)
+    print('Your favorite movies:\n', '*'*40)
+    pprint(db.translate(db.users[user].my_favorites(n=20), fn=db.get_title))
+    print('Your recommending movies:\n', '*'*40)
+    pprint(db.translate(rec, fn=db.get_title)) # TODO: Add decorator for translate?
+    print(time.time() - start)
     assert False
+
 
     #assert False
 # def test_number_of_entries():
