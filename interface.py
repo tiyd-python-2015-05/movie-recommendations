@@ -16,7 +16,7 @@ def startup():
     m_list = make_movie_object_list(num_of_movies, \
                                         movie_id_dict, movie_names_dict)
     u_list = make_user_object_list(num_of_users, user_id_dict)
-    return m_list
+    return m_list, u_list
 
 def make_movie_object_list(num_of_movies, movie_id_dict, movie_names_dict):
     """This creates a list of movie objects.
@@ -71,20 +71,77 @@ def movie_sorted_list(m_list, rating_filter=5, length_list=20):
     top_20 = sort_list[:length_list]
     return top_20
 
-def display_top():
-    m_list = startup()
+def display_top(m_list):
     sorted_movies = movie_sorted_list(m_list)
     for i in range(len(sorted_movies)):
         print("Movie: {}, Rating: {}".format(sorted_movies[i].movie_title, \
                                         sorted_movies[i].average_rating))
 
-# def display_top_user_none():
-#     m_list = startup()
-#     sorted_movies = movie_sorted_list(m_list)
-#     sorted_user_none = if sorted_movies
-#     for i in range(len(sorted_movies)):
-#         print("Movie: {}, Rating: {}".format(sorted_movies[i].movie_title, \
-#                                         sorted_movies[i].average_rating))
+def get_user_input():
+    user_input = input("""What would you like to see?
+    1. Top overall movies
+    2. Popular movies you haven't seen (requires user id)
+    3. Movie recommendations specific to you (requires user id)
+    Please enter a number or enter e to exit.\n> """)
+    if user_input = 1 or user_input = 2:
+        return user_input
+    if user_input == e or user_input == E:
+        return exit()
+    else:
+        return get_user_input
+
+def user_answer():
+    user_input = int(get_user_input())
+    if user_input == 1:
+        return display_top(m_list)
+
+    elif user_input == 2:
+        movies_not_seen = movies_user_not_seen(u_list)
+        for i in movies_not_seen:
+            print("Movie: {}, Rating: {}".format(i.movie_title, \
+                                                 i.average_rating))
+    elif user_input == 3:
+
+
+def movies_user_not_seen(u_list, rating_filter=5, length_of_list=20):
+    """Displays popular movies the user has not seen.
+    The return is the movie objects. To display the Movie and Rating
+    you have to call these in the print function in user_answer().
+
+    Functional Arguement: (u_list, rating_filter=5, length_of_list=20)
+    u_list = see setup()
+    rating_filter = must have 5 or more ratings
+    length_of_list = the number of movies returned
+    """
+
+    user_id = int(input("Please enter your user ID#:\n> "))
+    user = u_list[user_id-1]
+    list_of_movies_not_seen = []
+    user.movies_reviewed()
+    for movie in m_list:
+        if len(movie.movie_rating) >= rating_filter:
+            if movie.movie_id not in user.movies_rated:
+                list_of_movies_not_seen.append(movie)
+    list_of_movies_sorted = sorted(list_of_movies_not_seen,\
+                                key=attrgetter("average_rating"), reverse=True)
+    return list_of_movies_sorted[:length_of_list]
+
+
+def display_personal_rec(u_list, m_list, ):
+    user_id = int(input("Please enter your user ID#:\n> "))
+    user = u_list[user_id-1]
+    list_of_vectors = [] #vector_self, vector_other
+    for i in u_list:
+        if user != i:
+        list_of_vectors.append(user.make_common_vectors(i))
+"""START HERE. NEED TO FINISH OPTION 3 IN user_input."""
+    for
+    user.create_similarity(other)
+
+    print("Your top three similar users: {}, similarity score: {}"\
+    .format())
+
 
 if __name__=='__main__':
-    print(display_top())
+    m_list, u_list = startup()
+    user_answer()

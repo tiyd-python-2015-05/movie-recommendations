@@ -32,6 +32,9 @@ class User:
         self.user_sim_dict = {}
 
     def rating_list(self, user_id_dict):
+        """Creates a list of all the movies and ratings for the user.
+        Functional Argument: (self, user_id_dict)
+        """
         self.user_rating = user_id_dict[self.user_id]
 
         total = 0.0
@@ -40,6 +43,9 @@ class User:
                 self.user_average = round((total/len(self.user_rating)), 2)
 
     def rating_dict(self, user_id_dict):
+        """Creates self.user_rating which is the movie_id: rating.
+        Functional Argument: (self, user_id_dict)
+        """
         self.user_rating_dict = {}
         for i in self.user_rating:
             self.user_rating_dict.setdefault(i[0], i[1])
@@ -50,13 +56,21 @@ class User:
         .format(self.user_id, len(self.user_rating), self.user_average)
 
     def movies_reviewed(self):
-        """ """
+        """Creates self.movies_rated, which is all the movies the
+        user has rated.
+        Functional Argument: (self)
+        """
         movies_ratings = []
         for i in self.user_rating:
             movies_ratings.append(i[0])
             self.movies_rated = movies_ratings
 
     def compare_user_reviews(self, other):
+        """Creates self.common_movies and self.not_in_common_movies.
+        The not in common is the list of movies the user has not seen.
+        Functional Argument: (self, other)
+        Need to provide the other user, who is the top_similar_users[0][0]
+        """
         movies_in_common = []
         movies_not_in_common = []
 
@@ -71,6 +85,12 @@ class User:
                 self.not_in_common_movies = movies_not_in_common
 
     def make_common_vectors(self, other):
+        """Need to iterate through this function with all other user ratings.
+        Returns vector_self and vector_other. These vectors are the ratings
+        for movies in common.
+        Functional Argument: (self, other)
+        other are all the other users.
+        """
         vector_self = []
         vector_other = []
         for i in self.common_movies:
@@ -80,29 +100,52 @@ class User:
         return vector_self, vector_other
 
     def create_similarity(self, other):
+        """Need to iterate through this function with all other user ratings
+        of self.common_movies. This will populate self.user_sim_dict
+        with return of make_common_vectors(self, other).
+        Fucntaionl Argument: (self, other)
+        other are all the other users.
+        """
         v1, v2 = self.make_common_vectors(other)
         similarity = calculate_similarity(v1, v2)
         self.user_sim_dict.setdefault(other.user_id, similarity)
 
     def top_similar_users(self):
+        """Creates self.top_similar_users, which is a list of tuples,
+        of the user_id in order and similarity score.
+        This should be passed as other into top_similar_movies.
+        Functional Argument: (self)
+        """
         sorted_list = sorted(self.user_sim_dict.items(), key=lambda x: x[1], reverse=True)
         self.top_similar_users = sorted_list
         return self.top_similar_users
 
     def movies_not_seen(self, other):
+        """Creates self.uncommon_dict which is a dictionary of movies
+        and other user ratings. The dictionary is unsorted.
+        This function should be passed into top_similar_movies.
+        Functional Arguments: (self, other)
+        other is self.top_similar_users[0][0]"""
         self.uncommon_dict = {}
         for i in self.not_in_common_movies:
             self.uncommon_dict.setdefault(i, other.user_rating_dict[i])
 
     def top_similar_movies(self, other, length=5):
+        """Returns the top movies based on an other user most similar to self.
+
+        Functional Arguments: (self, other, length=5)
+        other is the user most similar that must be passed into fucntion
+        from top_similar_users[0][0]
+        length is preset to 5, returns the top five movie_ids.
+        """
         #prints as a list of tuples
         top_uncommon_movies = sorted(self.uncommon_dict.items(),\
                                      key=lambda x: x[1], reverse=True)
         #calling 0-6 will give key of tuples
         top_uncommon_movies_list = [top_uncommon_movies[i][0] for i in range(length)]
-        return top_uncommon_movies_list
+        return top_uncommon_movie_ids_list
 
-
+################################################################################
 
 #this is outside the class
 def calculate_similarity(v1, v2, common=5):
