@@ -5,6 +5,11 @@ import pprint
 class DBError:
     pass
 
+# TODO: Add docstrings
+# TODO: Make Recommend object
+# TODO: Clean up debug tests
+# TODO: Move to full dataset as default?
+
 class User():
     def __init__(self, user_id='1', age='24', gender='M', job='technician', zipcode='85711'):
         self.user_id = user_id
