@@ -1,17 +1,36 @@
 import csv
+from operator import itemgetter
 
 
 # def read_csv(filename, delimiter):
 #     with open(filename, encoding="windows-1252") as file:
 #         reader = csv.reader(file, delimiter=delimiter)
-#         data = [row for row in reader]
+#         data = []
+#         for row in reader:
+#             row = row[:3]
+#             data.append(row)
+#         for item in data:
+#             for index in range(len(item)):
+#                 try:
+#                     item[index] = int(item[index])
+#                 except:
+#                     pass
 #         return data
 
 
 def dict_read_csv(filename, delimiter, *args):
     with open(filename, encoding="windows-1252") as file:
         reader = csv.DictReader(file, fieldnames=(args), delimiter=delimiter)
-        data = [row for row in reader]
+        data = []
+        for row in reader:
+            row = {key: row[key] for key in row if key != "Timestamp"}
+            data.append(row)
+        for item in data:
+            for key in item:
+                try:
+                    item[key] = int(item[key])
+                except:
+                    pass
         return data
 
 
@@ -27,7 +46,7 @@ class Movie:
     def get_genres(self, dictionary):
         genres = {key
                   for key in dictionary
-                  if dictionary[key] == "1" and
+                  if dictionary[key] == 1 and
                   key not in ['MovieID', 'Movie Title', 'release date',
                               'video release date', 'IMDb URL']}
         return genres
@@ -38,36 +57,54 @@ class Movie:
 
 class Ratings:
     def __init__(self, movies, user_ratings):
-        self.table = self.make_ratings_dict(movies, user_ratings)
+        self.movie_table = self.make_movie_ratings_dict(movies, user_ratings)
+        self.user_table = self.make_user_ratings_dict(movies, user_ratings)
 
-    def make_ratings_dict(self, movies, user_ratings):
-        table = {Movie(mov): [[user[key] for key in sorted(user, reverse=True)
-                               if key not in ["Timestamp", "MovieID"]]
-                              for user in user_ratings
-                              if user["MovieID"] == mov["MovieID"]]
-                 for mov in movies}
-        return table
+    def make_movie_ratings_dict(self, movies, user_ratings):
+        users = {}
+
+        for rating in user_ratings:
+            users[rating["MovieID"]] = users.get(rating["MovieID"], [])
+            users[rating["MovieID"]].append([rating["User"], rating["Rating"]])
+
+        movie_table = {Movie(mov): users[mov["MovieID"]] for mov in movies}
+
+        return movie_table
+
+    def make_user_ratings_dict(self, movies, user_ratings):
+        users = {}
+
+        for rating in user_ratings:
+            users[rating["User"]] = users.get(rating["User"], [])
+            users[rating["User"]].append([rating["MovieID"], rating["Rating"]])
+
+        return users
 
     def get_ratings(self, movie):
-        for key in self.table:
+        for key in self.movie_table:
             if key.ID == movie:
-                return [item[1] for item in self.table[key]]
+                return [item[1] for item in self.movie_table[key]]
 
     def ratings_avg(self, movie):
-        for key in self.table:
+        for key in self.movie_table:
             if key.ID == movie:
-                ratings = [int(item[1]) for item in self.table[key]]
-                return str(sum(ratings)/len(ratings))
+                ratings = [item[1] for item in self.movie_table[key]]
+                return sum(ratings)/len(ratings)
 
     def movie_title(self, movie):
-        for key in self.table:
+        for key in self.movie_table:
             if key.ID == movie:
                 return key.title
 
+    def movie_ID(self, movie):
+        for key in self.movie_table:
+            if key.title == movie:
+                return key.ID
+
     def get_user_ratings(self, user):
-        ratings = []
-        for key in self.table:
-            for rating in self.table[key]:
-                if rating[0] == str(user):
-                    ratings.append([key.title, rating[1]])
-        return sorted(ratings)
+        rating_list = []
+        for key in self.user_table:
+            if key == user:
+                rating_list = self.user_table[key]
+        title_ratings = [[self.movie_title(entry[0]), entry[1]] for entry in rating_list]
+        return sorted(title_ratings, key=itemgetter(0))
