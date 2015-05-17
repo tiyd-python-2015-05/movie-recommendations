@@ -261,7 +261,18 @@ class DataBase():
             #         for mid in self.users[top_matching_user].sort_ratings()
             #         if mid not in self.users[user_id].movies
             #         ][:n]
+class Recomendation():
+    """
+        This class should hold an individual Recommendation object
+        A list of them will be stored in each user object
+        Implement __le__ for sorting
+            Add function to select what the le method is, depending on criteria
+        Implement __hash__ to be used for removing duplicates???
+        Way to make object remove itself if it's a duplicate and < existing
+            or add extra data onto a list?
 
+
+    """
 
 if __name__ == '__main__':
     db = DataBase(users_file='datasets/ml-100k/uhead.user',
