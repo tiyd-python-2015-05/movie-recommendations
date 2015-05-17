@@ -97,7 +97,7 @@ def display_user(user_id, u_list):
     u = u_list[(user_id-1)]
     print("You have reviewed {} movies.".format(len(u.rating_list)))
     print("Your average review score is {}".format(u.average_rating))
-    print("The top rated movies you have not seen are: ")
+
 
 
 
@@ -110,22 +110,68 @@ def make_user_similarities(user_object):
     top_similar_users = user_object.create_top_users_in_common()
     return top_similar_users
 
+def user_options():
+    print("What would you like to do?")
+    print("1. See the top rated movies you haven't seen.")
+    print("2. See a list of similar users with recommendations.")
+    print("3. Quit")
+    user_input= int(input("Choose 1, 2, or 3: "))
+    if user_input > 3 or user_input < 1:
+        return user_option()
+    else:
+        return user_input
+
+
+
 if __name__ == "__main__":
     while True:
         m_list, u_list = startup()
         display_top_movies(m_list, 20, 5)
         user_id = choose_user()
         u = u_list[(user_id - 1)]
-        print(str(u))
+
         u.movies_reviewed()
+        print(str(u))
         display_user(user_id, u_list)
+        user_choice = user_options()
+        print("The top rated movies you have not seen are: ")
         display_top_user_movies(m_list, u_list, user_id, length_list=5, min_rev=5)
         similar_users = make_user_similarities(u)
-        similar_user_list = i[0] for i in similar_users
-        print similar_user_list
+        similar_user_list = [i[0] for i in similar_users]
+        sim_user1 = u_list[(similar_user_list[0]-1)]
+        sim_user2 = u_list[(similar_user_list[1]-1)]
+        sim_user3 = u_list[(similar_user_list[2]-1)]
+        top_rec_sim_user1 = u.movies_reviewed_not_seen(sim_user1)
+        top_rec_sim_user2 = u.movies_reviewed_not_seen(sim_user2)
+        top_rec_sim_user3 = u.movies_reviewed_not_seen(sim_user3)
         print("Your Top 3 Similar Users are: ")
         for i in similar_users:
             print("User {}, Similarity Score {}".format(i[0], i[1]))
+        print("For User {}, your top recommmendations are: ".format(sim_user1.user_id))
+#        print(top_rec_sim_user1)
+        for i in top_rec_sim_user1:
+            movie_id = i[0]
+            rating = i[1]
+            movie = m_list[(movie_id) - 1]
+            print("{}, Rated {}".format(movie.movie_title, rating))
+        print("For User {}, your top recommmendations are: ".format(sim_user2.user_id))
+        for i in top_rec_sim_user2:
+            movie_id = i[0]
+            rating = i[1]
+            movie = m_list[movie_id - 1]
+            print("{}, Rated {}".format(movie.movie_title, rating))
+        print("For User {}, your top recommmendations are: ".format(sim_user3.user_id))
+        for i in top_rec_sim_user3:
+            movie_id = i[0]
+            rating = i[1]
+            movie = m_list[movie_id - 1]
+            print("{}, Rated {}".format(movie.movie_title, rating))
+
+
+
+
+
+
 
 #    for i in top_movies:
 #        print("Movie: {} Average: {}".format(i.movie_title, i.average_rating))
