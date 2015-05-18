@@ -54,13 +54,13 @@ class User():
         return users
 
     @classmethod
-    """
-    Updates an existing list of User objects using ratings from a csv file
-    Returns the ubdated list of User objects
-    """
     def load_ratings(cls, filename, users):
+        """
+        Updates an existing list of User objects using ratings from a csv file
+        Returns the ubdated list of User objects
+        """
         fieldnames = ['user_id','item_id','rating','timestamp']
-        #ratings = {}
+        # ratings = {}
         with open(filename, encoding="windows-1252") as file:
             reader = csv.DictReader(file, delimiter='\t', fieldnames=fieldnames)
             for row in reader:
@@ -73,8 +73,8 @@ class User():
                     assert KeyError("That user_id does not exist")
         return users
     @property
-    """Returns all movie_ids for movies this user has rated"""
     def movies(self):
+        """Returns a flat list of all movie_ids for movies this user has rated"""
         try:
             return [item_id for item_id in self.ratings]
         except:
