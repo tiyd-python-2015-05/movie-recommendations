@@ -85,24 +85,6 @@ class User:
                 movies_uncommon.append(i)
         return movies_uncommon
 
-    # def compare_user_reviews(self, other):
-    #     """Creates self.common_movies and self.not_in_common_movies.
-    #     The not in common is the list of movies the user has not seen.
-    #     Functional Argument: (self, other)
-    #     Need to provide the other user, who is the top_similar_users[0][0]
-    #     """
-    #     movies_in_common = []
-    #     movies_not_in_common = []
-    #
-    #     for i in self.movies_rated:
-    #         if i in other.movies_rated:
-    #             movies_in_common.append(i)
-    #             self.common_movies = movies_in_common
-    #
-    #     for i in other.movies_rated:
-    #         if i not in self.movies_rated:
-    #             movies_not_in_common.append(i)
-    #             self.not_in_common_movies = movies_not_in_common
 
     def make_common_vectors(self, other):
         """Need to iterate through this function with all other user ratings.

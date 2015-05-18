@@ -28,31 +28,3 @@ def test_make_user_object_list():
 def test_movie_sorted_list():
     new_movie_list = make_movie_object_list(num_of_movies, movie_id_dict, movie_names_dict)
     assert movie_sorted_list(new_movie_list)[0] == new_movie_list[1]
-
-# user = User(10)
-# user.movies_rated = [i for i in range(1:20)]
-# movie_list_w_avg_rating = generator()
-
-# def generator():
-#     ratings = [[1, 1], [1, 2], [1, 2, 3, 4, 5], [1, 2, 3]]
-#     gen_movie_rating_dict = {}
-#     for i in range(1,41):
-#         for x in ratings:
-#             gen_movie_rating_dict(i, x)
-#     return gen_movie_rating_dict
-#
-# def test_movies_user_not_seen(user_id):
-#     user = User(10)
-#     movie.movie_rating = generator()
-#     u_list = [i for i in range(1,15)]
-#     user = 10
-#     user.movies_rated = [i for i in range(1,15)]
-#     movie.movie_rating =
-#     assert movies_user_not_seen(u_list, rating_filter=3, length_of_list=5) ==\
-
-
-    list_of_movies_not_seen = []
-    for movie in m_list:
-        if movie.movie_id not in user.movies_rated:
-            list_of_movies_not_seen.append(movie.movie_id)
-            return sorted(list_of_movies_not_seen)

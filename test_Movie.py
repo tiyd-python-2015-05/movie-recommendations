@@ -83,16 +83,16 @@ def test_movies_reviewed():
     u.movies_reviewed()
     assert u.movies_rated == [250, 253, 255, 210, 12, 10]
 
-def test_compare_user_reviews():
-    u = User(1)
-    t = User(2)
-    u.rating_list(user_id_dict)
-    t.rating_list(user_id_dict)
-    u.movies_reviewed()
-    t.movies_reviewed()
-    u.compare_user_reviews(t)
-    assert u.common_movies == [250, 253, 10]
-    assert u.not_in_common_movies == [55, 2, 11]
+# def test_compare_user_reviews():
+#     u = User(1)
+#     t = User(2)
+#     u.rating_list(user_id_dict)
+#     t.rating_list(user_id_dict)
+#     u.movies_reviewed()
+#     t.movies_reviewed()
+#     u.compare_user_reviews(t)
+#     assert u.common_movies == [250, 253, 10]
+#     assert u.not_in_common_movies == [55, 2, 11]
 
 def test_make_common_vectors():
     u = User(1)
@@ -105,7 +105,6 @@ def test_make_common_vectors():
     t.movies_reviewed()
     u.compare_user_reviews(t)
     assert u.make_common_vectors(t) == ([3, 2, 5], [1, 1, 3])
-#go back and test shape exception in make_common_vectors
 
 v1 = [1, 2, 3, 4]
 v2 = [1, 2, 3, 4, 5, 6, 7, 8]

@@ -1,7 +1,7 @@
 from open_file_read import *
 from Movie import *
 from operator import attrgetter, itemgetter
-
+import os
 
 def startup():
     data_file = 'u.data'
@@ -16,7 +16,7 @@ def startup():
     m_list = make_movie_object_list(num_of_movies, \
                                         movie_id_dict, movie_names_dict)
     u_list = make_user_object_list(num_of_users, user_id_dict)
-    return [user_id_dict, m_list, u_list]
+    return [user_id_dict, m_list, u_list, movie_names_dict]
 
 def make_movie_object_list(num_of_movies, movie_id_dict, movie_names_dict):
     """This creates a list of movie objects.
@@ -76,38 +76,73 @@ def display_top(m_list):
     for i in range(len(sorted_movies)):
         print("Movie: {}, Rating: {}".format(sorted_movies[i].movie_title, \
                                         sorted_movies[i].average_rating))
+    print("\n")
 
 def user_choice():
-    user_choice = input("""What would you like to see?
+    user_answer = input("""What would you like to see?
     1. Top overall movies
     2. Popular movies you haven't seen (requires user id)
     3. Movie recommendations specific to you (requires user id)
     Please enter a number or enter e to exit.\n> """)
 
-    if user_choice == '1':
+    if user_answer == '1':
         return display_top(m_list)
 
-    elif user_choice == '2':
+    elif user_answer == '2':
         movies_not_seen = movies_user_not_seen(u_list)
         for i in movies_not_seen:
             print("Movie: {}, Rating: {}".format(i.movie_title, \
                                                  i.average_rating))
-    elif user_choice == '3':
+        print("\n")
+
+    elif user_answer == '3':
         user_id = int(input("Please enter your user ID#:\n> "))
 
         sim_users = display_sim_users(u_list, user_id)
         print("Your top three similar users:")
         for i in range(3):
-            print("User_ID: {}, Similarity Score: {}"\
+            print("User: {}, Similarity Score: {}"\
                   .format(sim_users[i][0], sim_users[i][1]))
         print("\n")
 
+        movie_recs = display_sim_user_recs(u_list, user_id)
+        movie_recs_sim1 = movie_recs[0]
+        movie_recs_sim2 = movie_recs[1]
+        movie_recs_sim3 = movie_recs[2]
+        movie_list_1 = [movie_recs_sim1[i][0] \
+                        for i in range(len(movie_recs_sim1))]
+        movie_list_2 = [movie_recs_sim2[i][0] \
+                for i in range(len(movie_recs_sim2))]
+        movie_list_3 = [movie_recs_sim3[i][0] \
+                                for i in range(len(movie_recs_sim3))]
+        for key in movies_name_dict:
+            if key in movie_list_1:
+                print("User1 Recommends: {}".format(movies_name_dict[key]))
+        print("\n")
 
-    elif user_choice == 'e' or user_choice == 'E':
+        for key in movies_name_dict:
+            if key in movie_list_2:
+                print("User2 Recommends: {}".format(movies_name_dict[key]))
+        print("\n")
+
+        for key in movies_name_dict:
+            if key in movie_list_3:
+                print("User3 Recommends: {}".format(movies_name_dict[key]))
+        print("\n")
+
+    elif user_answer == 'e' or user_choice == 'E':
         return exit()
 
     else:
         return user_answer()
+
+    second_question = input("Would you like to see anything else? Y/n \n> ")\
+                            .upper()
+    if second_question == 'Y':
+        os.system('clear')
+        return user_choice()
+    else:
+        return exit()
 
 def movies_user_not_seen(u_list, rating_filter=5, length_of_list=20):
     """Displays popular movies the user has not seen.
@@ -161,7 +196,8 @@ def display_sim_user_recs(u_list, user_id):
     sim_user1_top5 = user.movies_not_seen(sim_users[0])
     sim_user2_top5 = user.movies_not_seen(sim_users[1])
     sim_user3_top5 = user.movies_not_seen(sim_users[2])
-    movie_rec_list = [sim_user1_top5, sim_user2_top5, sim_user3_top5]
+    movie_rec_id_list = [sim_user1_top5, sim_user2_top5, sim_user3_top5]
+    return movie_rec_id_list
 
 
 if __name__=='__main__':
@@ -169,5 +205,6 @@ if __name__=='__main__':
     user_id_dict = start[0]
     m_list = start[1]
     u_list = start[2]
+    movies_name_dict = start[3]
     user_choice()
     # print(display_sim_user_recs(u_list, 4))
