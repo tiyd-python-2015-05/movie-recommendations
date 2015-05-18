@@ -1,5 +1,11 @@
 # Movie Recommendations
 
+# Instructions:
+
+Open your Terminal and type:python3 interface.py
+
+You can enter a user ID between 1 and 943 to access personalized suggestions.
+
 ## Description
 
 Use the MovieLens data to recommend movies to users.

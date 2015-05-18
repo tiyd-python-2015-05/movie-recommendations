@@ -59,3 +59,14 @@ docs/_build/
 # PyBuilder
 target/
 
+u.data
+u.genre
+u.info
+u.item
+.DS_Store
+notes.txt
+u.sample_data
+u.sample_item
+u.clean_item_list
+u.clean_data_list
+README_movies
