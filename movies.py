@@ -15,18 +15,82 @@ use_1m = True
 use_pearson = True
 
 
+class MovieOrUser:
+
+    def __init__(self):
+        self.rate_val = {}
+
+    def avg(self):
+        lval = list(self.rate_val.values())
+
+    def avg(self):
+        lval = list(self.rate_val.values())
+        return sum(lval) / len(lval)
+
+    def std(self):
+        lval = list(self.rate_val.values())
+        mean = self.avg()
+        return sum((i - mean)**2 for i in lval)**(0.5) / len(lval)
+
+    def add_rating(self, object_id, rating):
+        self.rate_val[object_id] = rating
+
+    def avg_cutoff(self):
+        lval = list(self.rate_val.values())
+        if len(lval) < 5:  # few reviews, send to bottom of list
+            return 0
+        if exclude and self.idVal in current_user.rate_val.keys():
+            return 0
+        ans = sum(lval) / len(lval)
+        return ans
+
+    def __add__(self, other):
+        '''Returns 3 lists of movies in common between u1 and u2
+            lists are (ID, user #1 stars, user #2 stars)'''
+        indicies = []
+        o1_stars = []
+        o2_stars = []
+        for op1 in self.rate_val:
+            for op2 in other.rate_val:
+                if op1 == op2:
+                    indicies.append(op1)
+                    o1_stars.append(self.rate_val[op1])
+                    o2_stars.append(other.rate_val[op2])
+        return indicies, o1_stars, o2_stars
+
+    def similar(self, the_dict):
+        '''If movie, returns list about similar movies
+           if user, returns list about similar users
+            (id value of similar ones, correlation coefficient)
+            previously called common_objects'''
+        similar_ids = [0 for i in range(5)]
+        similar_sc = [0 for i in range(5)]
+        for o2_id in the_dict.keys():
+            if o2_id != self.idVal:
+                o2 = the_dict[o2_id]
+                o12mid, o1s, o2s = self + o2
+                if use_pearson:
+                    score = pearson_product(o1s, o2s)
+                else:
+                    score = euclidean_distance(o1s, o2s)
+                if score > min(similar_sc) and len(o1s) > 5:
+                    i = similar_sc.index(min(similar_sc))
+                    similar_ids[i] = o2_id
+                    similar_sc[i] = score
+        return similar_ids, similar_sc
+
+
 @functools.total_ordering
-class Movie:
+class Movie(MovieOrUser):
 
     def __init__(self, idVal, title, rd, video_rd, url):
+        MovieOrUser.__init__(self)
         self.idVal = idVal
         self.title = title
         self.rd = rd
         self.video_rd = video_rd
         self.url = url
         self.genre = []
-        self.rate_val = {}
-        self.rate_obj = {}
         self.user_FOM = []
 
     def __str__(self):
@@ -50,26 +114,6 @@ class Movie:
             rt_st += g + " "
         return rt_st
 
-    def add_rating(self, user_id, user, rating):
-        self.rate_val[user_id] = rating
-        self.rate_obj[user_id] = user
-
-    def list_scores(self):
-        return list(self.rate_val.values())
-
-    def avg(self):
-        lval = self.list_scores()
-        return sum(lval) / len(lval)
-
-    def avg_cutoff(self):
-        lval = self.list_scores()
-        if len(lval) < 5:  # few reviews, send to bottom of list
-            return 0
-        if exclude and self.idVal in current_user.rate_val.keys():
-            return 0
-        ans = sum(lval) / len(lval)
-        return ans
-
     def add_score(self, a_score):
         self.user_FOM.append(a_score)
 
@@ -80,34 +124,17 @@ class Movie:
             return max(self.user_FOM)
 
 
-class User:
+class User(MovieOrUser):
 
     def __init__(self, idVal):
-        self.id = idVal
-        self.rate_val = {}
-        self.rate_obj = {}
+        MovieOrUser.__init__(self)
+        self.idVal = idVal
 
     def __str__(self):
         rt_st = "reviewed " + str(len(self.rate_val)).rjust(4) + " movies, "
         rt_st += " avg score of " + str(round(self.avg(), 2)) + " stars, "
         rt_st += " std of " + str(round(self.std(), 2)) + " stars"
         return rt_st
-
-    def list_scores(self):
-        return list(self.rate_val.values())
-
-    def avg(self):
-        lval = self.list_scores()
-        return sum(lval) / len(lval)
-
-    def std(self):
-        lval = self.list_scores()
-        mean = self.avg()
-        return sum((i - mean)**2 for i in lval)**(0.5) / len(lval)
-
-    def add_rating(self, movie_id, movie, rating):
-        self.rate_val[movie_id] = rating
-        self.rate_obj[movie_id] = movie
 
     def movie_hist(self):
         rt_st = ""
@@ -218,47 +245,10 @@ def read_user_file():
                 user_dict[user_id] = User(user_id)
             user = user_dict[user_id]
             movie = movie_dict[movie_id]
-            user_dict[user_id].add_rating(movie_id, movie, rating)
-            movie_dict[movie_id].add_rating(user_id, user, rating)
+            user_dict[user_id].add_rating(movie_id, rating)
+            movie_dict[movie_id].add_rating(user_id, rating)
 
     return user_dict
-
-
-def common_objects(o1_id, the_dict):
-    '''If movie, returns list about similar movies
-       if user, returns list about similar users
-        (id value of similar ones, correlation coefficient)'''
-    o1 = the_dict[o1_id]
-    similar_ids = [0 for i in range(5)]
-    similar_sc = [0 for i in range(5)]
-    for o2_id in the_dict.keys():
-        if o2_id != o1_id:
-            o2 = the_dict[o2_id]
-            o12mid, o1s, o2s = common_links(o1, o2)
-            if use_pearson:
-                score = pearson_product(o1s, o2s)
-            else:
-                score = euclidean_distance(o1s, o2s)
-            if score > min(similar_sc) and len(o1s) > 5:
-                i = similar_sc.index(min(similar_sc))
-                similar_ids[i] = o2_id
-                similar_sc[i]  = score
-    return similar_ids, similar_sc
-
-
-def common_links(object1, object2):
-    '''Returns 3 lists of movies in common between u1 and u2
-        lists are (ID, user #1 stars, user #2 stars)'''
-    indicies = []
-    o1_stars = []
-    o2_stars = []
-    for op1 in object1.rate_val:
-        for op2 in object2.rate_val:
-            if op1 == op2:
-                indicies.append(op1)
-                o1_stars.append(object1.rate_val[op1])
-                o2_stars.append(object2.rate_val[op2])
-    return indicies, o1_stars, o2_stars
 
 
 def search_for_movie(movie_dict):
@@ -273,14 +263,14 @@ def search_for_movie(movie_dict):
         if len(movie_ids) < 10:
             i_max = len(movie_ids)
         for i in range(i_max):
-            print(str(i+1)+" "+str(movie_dict[movie_ids[i]]))
+            print(str(i + 1) + " " + str(movie_dict[movie_ids[i]]))
         print(" ")
         text = input(" make a selection or type a new search: ")
         if len(text) == 0:
             text = " "
         if text[0].isdigit():
             break
-    return movie_ids[i-1]
+    return movie_ids[i - 1]
     print(" ")
 
 
@@ -333,7 +323,7 @@ def compare_random_users(user_dict):
             u2 = user_dict[random.choice(list(user_dict.keys()))]
             if u1 != u2:
                 break
-        u12mid, u1s, u2s = common_links(u1, u2)
+        u12mid, u1s, u2s = u1 + u2
 
         print("user1: " + " ".join([str(u1s[i]) for i in range(len(u1s))]))
         print("user2: " + " ".join([str(u2s[i]) for i in range(len(u2s))]))
@@ -363,7 +353,7 @@ def similarity_suggestions(movie_dict, user_dict):
     print(" ")
     print(" Watch reccomendations based off similar users")
     print("                                   Title             Score")
-    group_ids, group_scores = common_objects(current_user_id, user_dict)
+    group_ids, group_scores = current_user.similar(user_dict)
 
     for i in range(len(group_ids)):
         u2 = user_dict[group_ids[i]]
@@ -387,15 +377,17 @@ def similarity_suggestions(movie_dict, user_dict):
             print(str(movie_dict[top_mid[i]]).rjust(50) + " " +
                   str(round(top_scores[i], 2)))
 
+
 def similar_movie_suggest(m_id, movie_dict, user_dict):
     print(" ")
     current_movie = movie_dict[m_id]
     print(" Movies similar to '" + str(current_movie) + "'")
     print("based on user score correlation")
     print(" ")
-    ids, scores = common_objects(m_id, movie_dict)
+    ids, scores = current_movie.similar(movie_dict)
     for i in range(len(ids)):
-        print(str(i) + " " + str(movie_dict[ids[i]]))
+        if ids[i] != 0:
+            print(str(i) + " " + str(movie_dict[ids[i]]))
     print(" ")
     print(" Pick a movie to switch to, or just hit enter")
     sel = input("   enter selection: ")
@@ -475,7 +467,7 @@ if __name__ == '__main__':
         print(" ")
         print("Data is loaded. What do you want to do with it?")
         print(" current user is #" + str(current_user_id))
-        print(" current movie is '" + str(current_movie)+"'")
+        print(" current movie is '" + str(current_movie) + "'")
         if use_pearson:
             cor_text = "pearson correlation"
         else:
