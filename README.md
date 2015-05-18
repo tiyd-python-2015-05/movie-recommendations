@@ -14,10 +14,18 @@ After completing this assignment, you should be able to:
 
 ## Details
 
-* A Git repo called `movie-recommendations` containing at least:
-  * `README.md` file explaining how to run your project
-  * modules for your program
-  * tests for your program
+Use via
+$ python3 movies.py
+The options will follow from there
+
+### Excepted files
+
+This program expects the existence of directories
+* ml-100k
+* ml-1m
+
+These directories should hold the unzipped contents of the
+MovieLens data.
 
 ## Normal Mode
 
