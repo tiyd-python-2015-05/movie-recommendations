@@ -1,5 +1,5 @@
 from movie_ratings import dict_read_csv, Movie, Ratings
-import recommendations2
+import recommendations
 
 
 user_ratings = dict_read_csv("sample.csv", "\t", "User", "MovieID",
@@ -15,11 +15,11 @@ movies = dict_read_csv("sample2.csv", "|",
 
 ratings = Ratings(movies, user_ratings)
 
-recommender = recommendations2.Recommender(ratings)
+recommender = recommendations.Recommender(ratings)
 
-recommender_2 = recommendations2.Recommender(ratings, movie_filter=1)
+recommender_2 = recommendations.Recommender(ratings, movie_filter=1)
 
-recommender_3 = recommendations2.Recommender(ratings, user_filter=2, movie_filter=2)
+recommender_3 = recommendations.Recommender(ratings, user_filter=2, movie_filter=2)
 
 
 def test_movie_avgs():
@@ -89,7 +89,7 @@ movies2 = dict_read_csv("sample2.csv", "|",
 
 ratings2 = Ratings(movies2, user_ratings2)
 
-recommender2 = recommendations2.Recommender(ratings2)
+recommender2 = recommendations.Recommender(ratings2)
 
 
 def test_pearson_score():

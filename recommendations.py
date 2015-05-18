@@ -3,7 +3,7 @@ import math
 
 
 class Recommender:
-    def __init__(self, ratings, movie_filter=5, user_filter=3):
+    def __init__(self, ratings, movie_filter=9, user_filter=3):
         self.ratings = ratings
         self.movie_filter = movie_filter
         self.user_filter = user_filter
@@ -50,19 +50,13 @@ class Recommender:
     def user_match(self, user1, user2):
         user1_ratings = user1
         user2_ratings = user2
-        # user1_ratings = self.ratings.get_user_ratings(user1)
-        # user2_ratings = self.ratings.get_user_ratings(user2)
-        # shared_ratings = []
+
         comparison = {rating[0] for rating in user1_ratings}
         user1_ratings = [rating[1] for rating in user1_ratings]
         user2_ratings = [rating[1] for rating in user2_ratings if rating[0] in comparison]
 
-        # return user1_ratings, user2_ratings
         shared_ratings = zip(user1_ratings, user2_ratings)
-        # for rating1 in user1_ratings:
-        #     for rating2 in user2_ratings:
-        #         if rating1[0] == rating2[0]:
-        #             shared_ratings.append((rating1, rating2))
+
         return list(shared_ratings)
 
     def pearson_score(self, user1, user2):
@@ -131,7 +125,6 @@ class Recommender:
         return self.double_sort(recommendations)
 
     def user_recommendation(self, user, cut_off=10, pearson=True):
-        # users = list(self.ratings.user_table.keys())
         users = [[key, self.ratings.user_table[key]] for key in self.ratings.user_table]
         input_user = [user, self.ratings.user_table[user]]
         if pearson:

@@ -2,22 +2,6 @@ import csv
 from operator import itemgetter
 
 
-# def read_csv(filename, delimiter):
-#     with open(filename, encoding="windows-1252") as file:
-#         reader = csv.reader(file, delimiter=delimiter)
-#         data = []
-#         for row in reader:
-#             row = row[:3]
-#             data.append(row)
-#         for item in data:
-#             for index in range(len(item)):
-#                 try:
-#                     item[index] = int(item[index])
-#                 except:
-#                     pass
-#         return data
-
-
 def dict_read_csv(filename, delimiter, *args):
     with open(filename, encoding="windows-1252") as file:
         reader = csv.DictReader(file, fieldnames=(args), delimiter=delimiter)
