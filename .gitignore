@@ -59,3 +59,5 @@ docs/_build/
 # PyBuilder
 target/
 
+# data file directory
+ml-100K/
